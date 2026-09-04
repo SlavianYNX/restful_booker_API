@@ -9,15 +9,30 @@ jobs:
   api-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Newman and htmlextra reporter
+        run: npm install -g newman newman-reporter-htmlextra
 
       - name: Run Newman collection
-        uses: postman/newman@v6
+        run: |
+          newman run ://herokuapp.com.postman_collection.json \
+            -e ://herokuapp.com.postman_environment.json \
+            -r cli,htmlextra \
+            --reporter-htmlextra-export newman/report.html \
+            --env-var "base_url=https://://herokuapp.com/" \
+            --env-var "valid_login=${{ secrets.API_USERNAME }}" \
+            --env-var "valid_password=${{ secrets.API_PASSWORD }}"
+
+      - name: Upload HTML Report
+        uses: actions/upload-artifact@v4
+        if: always() # Отчет сохранится, даже если какие-то тесты упадут
         with:
-          collection: restful-booker.herokuapp.com.postman_collection.json
-          environment: restful-booker.herokuapp.com.postman_environment.json
-          env-var: |
-            base_url=https://restful-booker.herokuapp.com/
-            valid_login=${{ secrets.API_USERNAME }}
-            valid_password=${{ secrets.API_PASSWORD }}
-          reporters: cli
+          name: postman-api-test-report
+          path: newman/report.html
