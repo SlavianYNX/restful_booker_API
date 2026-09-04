@@ -164,7 +164,22 @@
                 },
                 "description": "Generated from cURL: curl --location --request POST '{{base_url}}auth' --header 'Content-Type: application/json' --header 'Accept: application/json' --data-raw '{\"username\":\"{{valid_login}}\",\"password\":\"{{invalid_password}}\"}'"
               },
-              "response": []
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                      "pm.test(\"Response time is less than 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                      "pm.test(\"Response has JSON body\", function () { pm.response.to.have.jsonBody(); });",
+                      "pm.test(\"Response does not contain token\", function () { const j = pm.response.json(); pm.expect(j).to.not.have.property(\"token\"); });",
+                      "pm.test(\"Response contains Bad credentials reason\", function () { const j = pm.response.json(); pm.expect(j.reason).to.eql(\"Bad credentials\"); });"
+                    ]
+                  }
+                }
+              ]
             },
             {
               "name": "TC-AUTH-004 - Empty body",
@@ -244,7 +259,22 @@
                 },
                 "description": "Generated from cURL: curl --location --request POST '{{base_url}}auth' --header 'Content-Type: application/json' --header 'Accept: application/json' --data-raw '{\"username\":\"{{valid_login}}\"}'"
               },
-              "response": []
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                      "pm.test(\"Response time is less than 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                      "pm.test(\"Response has JSON body\", function () { pm.response.to.have.jsonBody(); });",
+                      "pm.test(\"Response does not contain token\", function () { const j = pm.response.json(); pm.expect(j).to.not.have.property(\"token\"); });",
+                      "pm.test(\"Response contains Bad credentials reason\", function () { const j = pm.response.json(); pm.expect(j.reason).to.eql(\"Bad credentials\"); });"
+                    ]
+                  }
+                }
+              ]
             }
           ]
         }
@@ -418,7 +448,7 @@
           "name": "Negative",
           "item": [
             {
-              "name": "TC-BOOK-003",
+              "name": "TC-BOOK-003 - Empty firstname",
               "event": [
                 {
                   "listen": "test",
@@ -462,14 +492,14 @@
               "response": []
             },
             {
-              "name": "TC-BOOK-004 - Missing firstname",
+              "name": "TC-BOOK-004 - Empty JSON body",
               "event": [
                 {
                   "listen": "test",
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "// BUG: API should return a client validation error (400/422), not 500.",
+                      "// BUG: A 500 response indicates a server-side validation bug; expected 400/422.",
                       "pm.test(\"Status code is 400, 422, or 500\", function () {",
                       "    pm.expect([400, 422, 500]).to.include(pm.response.code);",
                       "});",
@@ -499,7 +529,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\"lastname\":\"Eremin\",\"totalprice\":2000,\"depositpaid\":true,\"bookingdates\":{\"checkin\":\"2026-10-01\",\"checkout\":\"2026-10-05\"},\"additionalneeds\":\"Breakfast\"}",
+                  "raw": "{}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -512,7 +542,7 @@
                     "{{base_url}}booking"
                   ]
                 },
-                "description": "Generated from cURL: curl --location --request POST '{{base_url}}booking' --header 'Content-Type: application/json' --header 'Accept: application/json' --data-raw '{\"lastname\":\"Eremin\",\"totalprice\":2000,\"depositpaid\":true,\"bookingdates\":{\"checkin\":\"2026-10-01\",\"checkout\":\"2026-10-05\"},\"additionalneeds\":\"Breakfast\"}'"
+                "description": "Generated from cURL: curl --location --request POST '{{base_url}}booking' --header 'Content-Type: application/json' --header 'Accept: application/json' --data-raw '{}'"
               },
               "response": []
             },
@@ -647,14 +677,14 @@
               "response": []
             },
             {
-              "name": "TC-BOOK-007 - Empty JSON body",
+              "name": "TC-BOOK-007 - Missing firstname",
               "event": [
                 {
                   "listen": "test",
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "// BUG: A 500 response indicates a server-side validation bug; expected 400/422.",
+                      "// BUG: API should return a client validation error (400/422), not 500.",
                       "pm.test(\"Status code is 400, 422, or 500\", function () {",
                       "    pm.expect([400, 422, 500]).to.include(pm.response.code);",
                       "});",
@@ -684,7 +714,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{}",
+                  "raw": "{\"lastname\":\"Eremin\",\"totalprice\":2000,\"depositpaid\":true,\"bookingdates\":{\"checkin\":\"2026-10-01\",\"checkout\":\"2026-10-05\"},\"additionalneeds\":\"Breakfast\"}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -697,12 +727,67 @@
                     "{{base_url}}booking"
                   ]
                 },
-                "description": "Generated from cURL: curl --location --request POST '{{base_url}}booking' --header 'Content-Type: application/json' --header 'Accept: application/json' --data-raw '{}'"
+                "description": "Generated from cURL: curl --location --request POST '{{base_url}}booking' --header 'Content-Type: application/json' --header 'Accept: application/json' --data-raw '{\"lastname\":\"Eremin\",\"totalprice\":2000,\"depositpaid\":true,\"bookingdates\":{\"checkin\":\"2026-10-01\",\"checkout\":\"2026-10-05\"},\"additionalneeds\":\"Breakfast\"}'"
               },
               "response": []
             },
             {
-              "name": "TC-BOOK-008 - Invalid JSON",
+              "name": "TC-BOOK-008 - Missing lastname",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "// BUG: API should return a client validation error (400/422), not 500.",
+                      "pm.test(\"Status code is 400, 422, or 500\", function () {",
+                      "    pm.expect([400, 422, 500]).to.include(pm.response.code);",
+                      "});",
+                      "",
+                      "pm.test(\"Response time is less than 3000 ms\", function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(3000);",
+                      "});",
+                      "",
+                      "pm.test(\"Response body is not empty\", function () {",
+                      "    pm.expect(pm.response.text()).to.not.be.empty;",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"totalprice\":2000,\"depositpaid\":true,\"bookingdates\":{\"checkin\":\"2026-10-01\",\"checkout\":\"2026-10-05\"},\"additionalneeds\":\"Breakfast\",\"firstname\":\"Slava\"}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}booking",
+                  "host": [
+                    "{{base_url}}booking"
+                  ]
+                },
+                "description": "Generated from cURL: curl --location --request POST '{{base_url}}booking' --header 'Content-Type: application/json' --header 'Accept: application/json' --data-raw '{\"lastname\":\"Eremin\",\"totalprice\":2000,\"depositpaid\":true,\"bookingdates\":{\"checkin\":\"2026-10-01\",\"checkout\":\"2026-10-05\"},\"additionalneeds\":\"Breakfast\"}'"
+              },
+              "response": []
+            },
+            {
+              "name": "TC-BOOK-009 - Invalid JSON",
               "request": {
                 "method": "POST",
                 "header": [
@@ -732,7 +817,20 @@
                 },
                 "description": "Generated from cURL: curl --location --request POST '{{base_url}}booking' --header 'Content-Type: application/json' --header 'Accept: application/json' --data-raw '{\"firstname\":\"Slava\",'"
               },
-              "response": []
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });",
+                      "pm.test('Response time is less than 3000 ms', function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                      "pm.test('Response body is not empty', function () { pm.expect(pm.response.text()).to.not.be.empty; });"
+                    ]
+                  }
+                }
+              ]
             }
           ]
         }
@@ -1558,6 +1656,95 @@
               ]
             },
             "description": "Generated from cURL: curl --request PUT --url '{{base_url}}booking/{{bookingId}}' --header 'Content-Type: application/json' --header 'Accept: application/json' --header 'Cookie: token={{token}}' --data '{\"firstname\":\"UpdatedSlava\",\"totalprice\":2500,\"depositpaid\":false,\"bookingdates\":{\"checkin\":\"2026-11-01\",\"checkout\":\"2026-11-10\"},\"additionalneeds\":\"Dinner\"}'"
+          },
+          "response": []
+        },
+        {
+          "name": "TC-PUT-005 - Invalid token",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "",
+                  "pm.sendRequest({",
+                  "    url: pm.environment.get(\"base_url\") + \"booking\",",
+                  "    method: \"POST\",",
+                  "    header: { \"Content-Type\": \"application/json\", \"Accept\": \"application/json\" },",
+                  "    body: { mode: \"raw\", raw: JSON.stringify({",
+                  "        firstname: \"ChainSlava\",",
+                  "        lastname: \"ChainEremin\",",
+                  "        totalprice: 1000,",
+                  "        depositpaid: true,",
+                  "        bookingdates: { checkin: \"2026-12-01\", checkout: \"2026-12-05\" },",
+                  "        additionalneeds: \"Breakfast\"",
+                  "    }) }",
+                  "}, function (err, res) {",
+                  "    if (!err && res && res.json() && res.json().bookingid !== undefined) {",
+                  "        pm.collectionVariables.set(\"bookingId\", String(res.json().bookingid));",
+                  "        console.log(\"Fresh bookingId set: \" + res.json().bookingid);",
+                  "    }",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 403\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is less than 3000ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(3000);",
+                  "});",
+                  "",
+                  "pm.test(\"Response body is Forbidden\", function () {",
+                  "    pm.expect(pm.response.text().trim()).to.eql(\"Forbidden\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "token=invalid_token_for_negative_test",
+                "disabled": false
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"firstname\":\"UpdatedSlava\",\"lastname\":\"UpdatedEremin\",\"totalprice\":2500,\"depositpaid\":false,\"bookingdates\":{\"checkin\":\"2026-11-01\",\"checkout\":\"2026-11-10\"},\"additionalneeds\":\"Dinner\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}booking/{{bookingId}}",
+              "host": [
+                "{{base_url}}booking"
+              ],
+              "path": [
+                "{{bookingId}}"
+              ]
+            },
+            "description": "Generated from cURL: curl --request PUT --url '{{base_url}}booking/{{bookingId}}' --header 'Content-Type: application/json' --header 'Accept: application/json' --header 'Cookie: token={{token}}' --data '{\"firstname\":\"UpdatedSlava\",\"lastname\":\"UpdatedEremin\",\"totalprice\":2500,\"depositpaid\":false,\"bookingdates\":{\"checkin\":\"2026-11-01\",\"checkout\":\"2026-11-10\"},\"additionalneeds\":\"Dinner\"}'"
           },
           "response": []
         }

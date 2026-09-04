@@ -26,6 +26,9 @@ jobs:
             -e restful-booker.herokuapp.com.postman_environment.json \
             -r cli,htmlextra \
             --reporter-htmlextra-export newman/report.html \
+            --reporter-htmlextra-omitHeaders \
+            --reporter-htmlextra-omitRequestBodies \
+            --reporter-htmlextra-omitResponseBodies \
             --env-var "base_url=https://restful-booker.herokuapp.com/" \
             --env-var "valid_login=${{ secrets.API_USERNAME }}" \
             --env-var "valid_password=${{ secrets.API_PASSWORD }}"

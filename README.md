@@ -1,7 +1,7 @@
 # restful_booker_API
 
 Автотесты (Postman + Newman) для публичного API [RestfulBooker](https://restful-booker.herokuapp.com/apidoc/index.html).
-**36 кейсов** в 8 группах: `POST /auth`, CRUD `/booking`, фильтры списка, `GET /ping`.
+**39 кейсов** в 8 группах: `POST /auth`, CRUD `/booking`, фильтры списка, `GET /ping`.
 
 ## Быстрый старт
 
@@ -16,8 +16,9 @@ newman run restful-booker.herokuapp.com.postman_collection.json \
   -r cli,htmlextra
 ```
 
-Логин/пароль RestfulBooker (`admin`/`password123`) в репозитории не хранятся —
-задаются локально при запуске или через секреты CI.
+Логин/пароль RestfulBooker в репозитории и документации не хранятся (значения по
+умолчанию — в официальной документации сервиса); задаются локально при запуске
+или через секреты CI.
 
 ## Переменные окружения
 
@@ -32,7 +33,9 @@ newman run restful-booker.herokuapp.com.postman_collection.json \
 
 Workflow `.github/workflows/restful-booker.yml` — запуск на push в `main` и PR.
 Устанавливает Newman, прогоняет коллекцию, загружает HTML-отчёт артефактом
-даже при падении тестов.
+даже при падении тестов. Отчёт собирается без заголовков и тел запросов/ответов
+(`omitHeaders`, `omitRequestBodies`, `omitResponseBodies`) — токен и креды
+не попадают в артефакт (GitHub маскирует секреты только в логах, но не в артефактах).
 
 Секреты (*Settings → Secrets and variables → Actions*):
 `API_USERNAME`, `API_PASSWORD` — креды API, подставляются в `--env-var`.
@@ -55,8 +58,9 @@ Workflow `.github/workflows/restful-booker.yml` — запуск на push в `m
 | Наблюдение (проверено на прогонах) | Ожидалось | Кейсы |
 |---|---|---|
 | `POST /auth` с неверными кредами → `200` + `{"reason":"Bad credentials"}` | 401/400 | TC-AUTH-002…005 |
-| `POST /booking` без `firstname` → `500` | 400/422 | TC-BOOK-004 |
-| `POST /booking` с пустым телом `{}` → `500` | 400/422 | TC-BOOK-007 |
+| `POST /booking` без `firstname` → `500` | 400/422 | TC-BOOK-007 |
+| `POST /booking` без `lastname` → `500` | 400/422 | TC-BOOK-008 |
+| `POST /booking` с пустым телом `{}` → `500` | 400/422 | TC-BOOK-004 |
 | `POST /booking` c `totalprice:"two thousand"` → принято, сохранено `null` | 400/422 | TC-BOOK-005 |
 | `GET /booking` с невалидной датой → `500` | 400 | TC-LIST-007 |
 | `PUT/PATCH/DELETE /booking/999999999` с токеном → `405` | 404 | TC-PUT-003, TC-PATCH-004, TC-DELETE-003 |
@@ -70,3 +74,4 @@ Workflow `.github/workflows/restful-booker.yml` — запуск на push в `m
 - Баги выше — умышленные «кривые» сценарии тренировочного API; при изменении
   сервиса тесты нужно актуализировать.
 - Ассерты времени (`< 3000 ms`) могут флакать на холодном старте Heroku.
+- Нумерация TC коллекции синхронизирована с xlsx; `TC-BOOK-009`, `TC-LIST-004/005/007`, `TC-PATCH-005` — дополнения к базовому дизайну.
