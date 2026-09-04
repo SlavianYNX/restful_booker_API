@@ -54,7 +54,15 @@
                       "\r",
                       "pm.collectionVariables.set(\"token\", responseJson.token);\r",
                       "\r",
-                      "console.log(\"Setup: token was saved successfully\");"
+                      "console.log(\"Setup: token was saved successfully\");",
+                      "",
+                      "pm.test(\"Content-Type is application/json\", function () {",
+                      "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                      "});",
+                      "",
+                      "pm.test(\"Token has valid format (10-32 alphanumeric chars)\", function () {",
+                      "    pm.expect(responseJson.token).to.match(/^[A-Za-z0-9]{10,32}$/);",
+                      "});"
                     ],
                     "type": "text/javascript",
                     "packages": {},
@@ -192,7 +200,9 @@
                       "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
                       "pm.test(\"Response time is less than 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
                       "pm.test(\"Response has JSON body\", function () { pm.response.to.have.jsonBody(); });",
-                      "pm.test(\"Response contains reason\", function () { const j = pm.response.json(); pm.expect(j).to.have.property(\"reason\"); });"
+                      "pm.test(\"Response contains reason\", function () { const j = pm.response.json(); pm.expect(j).to.have.property(\"reason\"); });",
+                      "pm.test(\"Response does not contain token\", function () { const j = pm.response.json(); pm.expect(j).to.not.have.property(\"token\"); });",
+                      "pm.test(\"Response contains Bad credentials reason\", function () { const j = pm.response.json(); pm.expect(j.reason).to.eql(\"Bad credentials\"); });"
                     ]
                   }
                 }
@@ -328,7 +338,26 @@
                       "\r",
                       "pm.collectionVariables.set(\"bookingId\", String(responseJson.bookingid));\r",
                       "\r",
-                      "console.log(\"Setup: bookingId was saved: \" + responseJson.bookingid);"
+                      "console.log(\"Setup: bookingId was saved: \" + responseJson.bookingid);",
+                      "",
+                      "pm.test(\"Content-Type is application/json\", function () {",
+                      "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                      "});",
+                      "",
+                      "pm.test(\"bookingid is a positive integer\", function () {",
+                      "    pm.expect(responseJson.bookingid).to.be.a(\"number\").that.is.above(0);",
+                      "});",
+                      "",
+                      "pm.test(\"Response booking echoes full request payload\", function () {",
+                      "    pm.expect(responseJson.booking).to.eql({",
+                      "        firstname: \"Вячеслав\",",
+                      "        lastname: \"Еремин\",",
+                      "        totalprice: 2000,",
+                      "        depositpaid: true,",
+                      "        bookingdates: { checkin: \"2026-04-09\", checkout: \"2026-04-15\" },",
+                      "        additionalneeds: \"Breakfast\"",
+                      "    });",
+                      "});"
                     ],
                     "type": "text/javascript",
                     "packages": {},
@@ -510,6 +539,11 @@
                       "",
                       "pm.test(\"Response body is not empty\", function () {",
                       "    pm.expect(pm.response.text()).to.not.be.empty;",
+                      "});",
+                      "",
+                      "// BUG: error body is a generic \"Internal Server Error\" text without details (verified on live runs).",
+                      "pm.test(\"Error body is generic server error text\", function () {",
+                      "    pm.expect(pm.response.text().trim()).to.eql(\"Internal Server Error\");",
                       "});"
                     ]
                   }
@@ -695,6 +729,11 @@
                       "",
                       "pm.test(\"Response body is not empty\", function () {",
                       "    pm.expect(pm.response.text()).to.not.be.empty;",
+                      "});",
+                      "",
+                      "// BUG: error body is a generic \"Internal Server Error\" text without details (verified on live runs).",
+                      "pm.test(\"Error body is generic server error text\", function () {",
+                      "    pm.expect(pm.response.text().trim()).to.eql(\"Internal Server Error\");",
                       "});"
                     ]
                   }
@@ -750,6 +789,11 @@
                       "",
                       "pm.test(\"Response body is not empty\", function () {",
                       "    pm.expect(pm.response.text()).to.not.be.empty;",
+                      "});",
+                      "",
+                      "// BUG: error body is a generic \"Internal Server Error\" text without details (verified on live runs).",
+                      "pm.test(\"Error body is generic server error text\", function () {",
+                      "    pm.expect(pm.response.text().trim()).to.eql(\"Internal Server Error\");",
                       "});"
                     ]
                   }
@@ -826,7 +870,9 @@
                     "exec": [
                       "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });",
                       "pm.test('Response time is less than 3000 ms', function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
-                      "pm.test('Response body is not empty', function () { pm.expect(pm.response.text()).to.not.be.empty; });"
+                      "pm.test('Response body is not empty', function () { pm.expect(pm.response.text()).to.not.be.empty; });",
+                      "// Expected error contract: 400 + \"Bad Request\" (verified on live runs).",
+                      "pm.test(\"Error body is Bad Request\", function () { pm.expect(pm.response.text().trim()).to.eql(\"Bad Request\"); });"
                     ]
                   }
                 }
@@ -868,6 +914,17 @@
                   "        pm.expect(item).to.be.an('object');",
                   "        pm.expect(item).to.have.property('bookingid').that.is.a('number');",
                   "    });",
+                  "})",
+                  "",
+                  "pm.test('Every bookingid is a positive integer', function () {",
+                  "    pm.response.json().forEach(function (item) {",
+                  "        pm.expect(item.bookingid).to.be.a('number').that.is.above(0);",
+                  "    })",
+                  "})",
+                  "",
+                  "pm.test('Booking IDs in the list are unique', function () {",
+                  "    const ids = pm.response.json().map(function (item) { return item.bookingid; })",
+                  "    pm.expect(new Set(ids).size).to.eql(ids.length)",
                   "})"
                 ]
               }
@@ -919,6 +976,11 @@
                   "    pm.response.json().forEach(function (item) {",
                   "        pm.expect(item).to.have.property('bookingid').that.is.a('number');",
                   "    });",
+                  "})",
+                  "",
+                  "pm.test('Filter results contain the booking created in Setup', function () {",
+                  "    const ids = pm.response.json().map(function (item) { return item.bookingid; })",
+                  "    pm.expect(ids).to.include(Number(pm.collectionVariables.get('bookingId')))",
                   "})"
                 ]
               }
@@ -976,6 +1038,11 @@
                   "    pm.response.json().forEach(function (item) {",
                   "        pm.expect(item).to.have.property('bookingid').that.is.a('number');",
                   "    });",
+                  "})",
+                  "",
+                  "pm.test('Filter results contain the booking created in Setup', function () {",
+                  "    const ids = pm.response.json().map(function (item) { return item.bookingid; })",
+                  "    pm.expect(ids).to.include(Number(pm.collectionVariables.get('bookingId')))",
                   "})"
                 ]
               }
@@ -1033,7 +1100,9 @@
                   "    pm.response.json().forEach(function (item) {",
                   "        pm.expect(item).to.have.property('bookingid').that.is.a('number');",
                   "    });",
-                  "})"
+                  "})",
+                  "",
+                  "// BUG: exact-date filter returns an empty array even for a booking with these exact dates (verified on live runs) - structure-only asserts here."
                 ]
               }
             }
@@ -1094,7 +1163,9 @@
                   "    pm.response.json().forEach(function (item) {",
                   "        pm.expect(item).to.have.property('bookingid').that.is.a('number');",
                   "    });",
-                  "})"
+                  "})",
+                  "",
+                  "// BUG: combined filter with exact dates returns an empty array (same date-filter issue as TC-LIST-004) - structure-only asserts here."
                 ]
               }
             }
@@ -1249,7 +1320,9 @@
                   "pm.test(\"Response body is valid JSON\", function () { pm.response.to.be.json; });",
                   "pm.test(\"Response is an object\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
                   "pm.test(\"Response includes required keys\", function () { pm.expect(pm.response.json()).to.include.all.keys(\"firstname\", \"lastname\", \"totalprice\", \"depositpaid\", \"bookingdates\"); });",
-                  "pm.test(\"Response fields have expected types\", function () { const json = pm.response.json(); pm.expect(json.firstname).to.be.a(\"string\"); pm.expect(json.lastname).to.be.a(\"string\"); pm.expect(json.totalprice).to.be.a(\"number\"); pm.expect(json.depositpaid).to.be.a(\"boolean\"); pm.expect(json.bookingdates).to.be.an(\"object\"); pm.expect(json.bookingdates.checkin).to.be.a(\"string\"); pm.expect(json.bookingdates.checkout).to.be.a(\"string\"); });"
+                  "pm.test(\"Response fields have expected types\", function () { const json = pm.response.json(); pm.expect(json.firstname).to.be.a(\"string\"); pm.expect(json.lastname).to.be.a(\"string\"); pm.expect(json.totalprice).to.be.a(\"number\"); pm.expect(json.depositpaid).to.be.a(\"boolean\"); pm.expect(json.bookingdates).to.be.an(\"object\"); pm.expect(json.bookingdates.checkin).to.be.a(\"string\"); pm.expect(json.bookingdates.checkout).to.be.a(\"string\"); });",
+                  "pm.test(\"Content-Type is application/json\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\"); });",
+                  "pm.test(\"Persisted data matches the booking created in Setup (CRUD integrity)\", function () { const j = pm.response.json(); pm.expect(j.firstname).to.eql(\"Вячеслав\"); pm.expect(j.lastname).to.eql(\"Еремин\"); pm.expect(j.totalprice).to.eql(2000); pm.expect(j.depositpaid).to.eql(true); pm.expect(j.bookingdates).to.eql({ checkin: \"2026-04-09\", checkout: \"2026-04-15\" }); pm.expect(j.additionalneeds).to.eql(\"Breakfast\"); });"
                 ]
               }
             }
@@ -1391,6 +1464,25 @@
                   "    const jsonData = pm.response.json();",
                   "    pm.expect(jsonData).to.include.all.keys(\"firstname\", \"lastname\", \"totalprice\", \"depositpaid\", \"bookingdates\", \"additionalneeds\");",
                   "    pm.expect(jsonData.bookingdates).to.include.all.keys(\"checkin\", \"checkout\");",
+                  "});",
+                  "",
+                  "pm.test(\"Content-Type is application/json\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+                  "});",
+                  "",
+                  "pm.test(\"Update is persisted (GET returns updated data)\", function () {",
+                  "    pm.sendRequest({",
+                  "        url: pm.environment.get(\"base_url\") + \"booking/\" + pm.collectionVariables.get(\"bookingId\"),",
+                  "        method: \"GET\",",
+                  "        header: { \"Accept\": \"application/json\" }",
+                  "    }, function (err, res) {",
+                  "        pm.expect(err, \"sendRequest GET failed\").to.eql(null);",
+                  "        pm.expect(res.code).to.eql(200);",
+                  "        const persisted = res.json();",
+                  "        pm.expect(persisted.firstname).to.eql(\"UpdatedSlava\");",
+                  "        pm.expect(persisted.totalprice).to.eql(2500);",
+                  "        pm.expect(persisted.additionalneeds).to.eql(\"Dinner\");",
+                  "    });",
                   "});"
                 ]
               }
@@ -1480,6 +1572,18 @@
                   "",
                   "pm.test(\"Response body is Forbidden\", function () {",
                   "    pm.expect(pm.response.text().trim()).to.eql(\"Forbidden\");",
+                  "});",
+                  "",
+                  "pm.test(\"Unauthorized update did not change data (GET)\", function () {",
+                  "    pm.sendRequest({",
+                  "        url: pm.environment.get(\"base_url\") + \"booking/\" + pm.collectionVariables.get(\"bookingId\"),",
+                  "        method: \"GET\",",
+                  "        header: { \"Accept\": \"application/json\" }",
+                  "    }, function (err, res) {",
+                  "        pm.expect(err, \"sendRequest GET failed\").to.eql(null);",
+                  "        pm.expect(res.code).to.eql(200);",
+                  "        pm.expect(res.json().firstname).to.eql(\"UpdatedSlava\");",
+                  "    });",
                   "});"
                 ]
               }
@@ -1608,6 +1712,19 @@
                   "",
                   "pm.test(\"Response body is not empty\", function () {",
                   "    pm.expect(pm.response.text().trim()).to.not.eql(\"\");",
+                  "});",
+                  "",
+                  "pm.test(\"Failed update did not corrupt data (GET)\", function () {",
+                  "    pm.sendRequest({",
+                  "        url: pm.environment.get(\"base_url\") + \"booking/\" + pm.collectionVariables.get(\"bookingId\"),",
+                  "        method: \"GET\",",
+                  "        header: { \"Accept\": \"application/json\" }",
+                  "    }, function (err, res) {",
+                  "        pm.expect(err, \"sendRequest GET failed\").to.eql(null);",
+                  "        pm.expect(res.code).to.eql(200);",
+                  "        pm.expect(res.json().firstname).to.eql(\"UpdatedSlava\");",
+                  "        pm.expect(res.json().lastname).to.eql(\"UpdatedEremin\");",
+                  "    });",
                   "});"
                 ]
               }
@@ -1704,6 +1821,18 @@
                   "",
                   "pm.test(\"Response body is Forbidden\", function () {",
                   "    pm.expect(pm.response.text().trim()).to.eql(\"Forbidden\");",
+                  "});",
+                  "",
+                  "pm.test(\"Invalid token update did not change data (GET)\", function () {",
+                  "    pm.sendRequest({",
+                  "        url: pm.environment.get(\"base_url\") + \"booking/\" + pm.collectionVariables.get(\"bookingId\"),",
+                  "        method: \"GET\",",
+                  "        header: { \"Accept\": \"application/json\" }",
+                  "    }, function (err, res) {",
+                  "        pm.expect(err, \"sendRequest GET failed\").to.eql(null);",
+                  "        pm.expect(res.code).to.eql(200);",
+                  "        pm.expect(res.json().firstname).to.eql(\"ChainSlava\");",
+                  "    });",
                   "});"
                 ]
               }
@@ -1784,6 +1913,21 @@
                   "pm.test(\"Unpatched fields are preserved\", function () {",
                   "    const jsonData = pm.response.json();",
                   "    pm.expect(jsonData).to.include.all.keys(\"lastname\", \"totalprice\", \"depositpaid\", \"bookingdates\");",
+                  "});",
+                  "",
+                  "pm.test(\"Patch is persisted, unpatched fields preserved (GET)\", function () {",
+                  "    pm.sendRequest({",
+                  "        url: pm.environment.get(\"base_url\") + \"booking/\" + pm.collectionVariables.get(\"bookingId\"),",
+                  "        method: \"GET\",",
+                  "        header: { \"Accept\": \"application/json\" }",
+                  "    }, function (err, res) {",
+                  "        pm.expect(err, \"sendRequest GET failed\").to.eql(null);",
+                  "        pm.expect(res.code).to.eql(200);",
+                  "        const persisted = res.json();",
+                  "        pm.expect(persisted.firstname).to.eql(\"PatchedSlava\");",
+                  "        pm.expect(persisted.lastname).to.eql(\"ChainEremin\");",
+                  "        pm.expect(persisted.totalprice).to.eql(1000);",
+                  "    });",
                   "});"
                 ]
               }
@@ -1887,6 +2031,21 @@
                   "    const jsonData = pm.response.json();",
                   "    pm.expect(jsonData.firstname).to.be.a(\"string\");",
                   "    pm.expect(jsonData.bookingdates).to.be.an(\"object\");",
+                  "});",
+                  "",
+                  "pm.test(\"Multi-field patch is persisted (GET)\", function () {",
+                  "    pm.sendRequest({",
+                  "        url: pm.environment.get(\"base_url\") + \"booking/\" + pm.collectionVariables.get(\"bookingId\"),",
+                  "        method: \"GET\",",
+                  "        header: { \"Accept\": \"application/json\" }",
+                  "    }, function (err, res) {",
+                  "        pm.expect(err, \"sendRequest GET failed\").to.eql(null);",
+                  "        pm.expect(res.code).to.eql(200);",
+                  "        const persisted = res.json();",
+                  "        pm.expect(persisted.totalprice).to.eql(3000);",
+                  "        pm.expect(persisted.additionalneeds).to.eql(\"Late checkout\");",
+                  "        pm.expect(persisted.firstname).to.eql(\"PatchedSlava\");",
+                  "    });",
                   "});"
                 ]
               }
@@ -1956,6 +2115,18 @@
                   "",
                   "pm.test(\"Response body is Forbidden\", function () {",
                   "    pm.expect(pm.response.text().trim()).to.eql(\"Forbidden\");",
+                  "});",
+                  "",
+                  "pm.test(\"Unauthorized patch did not change data (GET)\", function () {",
+                  "    pm.sendRequest({",
+                  "        url: pm.environment.get(\"base_url\") + \"booking/\" + pm.collectionVariables.get(\"bookingId\"),",
+                  "        method: \"GET\",",
+                  "        header: { \"Accept\": \"application/json\" }",
+                  "    }, function (err, res) {",
+                  "        pm.expect(err, \"sendRequest GET failed\").to.eql(null);",
+                  "        pm.expect(res.code).to.eql(200);",
+                  "        pm.expect(res.json().firstname).to.eql(\"PatchedSlava\");",
+                  "    });",
                   "});"
                 ]
               }
@@ -2069,6 +2240,42 @@
           "name": "TC-PATCH-005 - Empty patch body",
           "event": [
             {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// PATCH with {} is a no-op: 200 + unchanged booking (verified on live runs).",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is less than 3000ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(3000);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is JSON\", function () {",
+                  "    pm.response.to.be.json;",
+                  "});",
+                  "",
+                  "pm.test(\"Response is an object with all required keys\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an(\"object\");",
+                  "    pm.expect(jsonData).to.include.all.keys(\"firstname\", \"lastname\", \"totalprice\", \"depositpaid\", \"bookingdates\", \"additionalneeds\");",
+                  "    pm.expect(jsonData.bookingdates).to.include.all.keys(\"checkin\", \"checkout\");",
+                  "});",
+                  "",
+                  "pm.test(\"Empty patch does not change booking state\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.firstname).to.eql(\"PatchedSlava\");",
+                  "    pm.expect(jsonData.lastname).to.eql(\"ChainEremin\");",
+                  "    pm.expect(jsonData.totalprice).to.eql(3000);",
+                  "    pm.expect(jsonData.depositpaid).to.eql(true);",
+                  "    pm.expect(jsonData.additionalneeds).to.eql(\"Late checkout\");",
+                  "});"
+                ]
+              }
+            },
+            {
               "listen": "prerequest",
               "script": {
                 "type": "text/javascript",
@@ -2138,6 +2345,17 @@
                   "",
                   "pm.test(\"Response body is Created\", function () {",
                   "    pm.expect(pm.response.text().trim()).to.eql(\"Created\");",
+                  "});",
+                  "",
+                  "pm.test(\"Booking is actually deleted (GET returns 404)\", function () {",
+                  "    pm.sendRequest({",
+                  "        url: pm.environment.get(\"base_url\") + \"booking/\" + pm.collectionVariables.get(\"bookingId\"),",
+                  "        method: \"GET\",",
+                  "        header: { \"Accept\": \"application/json\" }",
+                  "    }, function (err, res) {",
+                  "        pm.expect(err, \"sendRequest GET failed\").to.eql(null);",
+                  "        pm.expect(res.code).to.eql(404);",
+                  "    });",
                   "});"
                 ]
               }
@@ -2377,6 +2595,10 @@
                   "",
                   "pm.test(\"Response body is Created\", function () {",
                   "    pm.expect(pm.response.text().trim()).to.eql(\"Created\");",
+                  "});",
+                  "",
+                  "pm.test(\"Content-Type is text/plain\", function () {",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/plain\");",
                   "});"
                 ]
               }

@@ -63,6 +63,7 @@ Workflow `.github/workflows/restful-booker.yml` — запуск на push в `m
 | `POST /booking` с пустым телом `{}` → `500` | 400/422 | TC-BOOK-004 |
 | `POST /booking` c `totalprice:"two thousand"` → принято, сохранено `null` | 400/422 | TC-BOOK-005 |
 | `GET /booking` с невалидной датой → `500` | 400 | TC-LIST-007 |
+| Фильтр `/booking` по точным датам существующей брони → пустой массив (BUG-007) | бронь должна попадать в выборку | TC-LIST-004, TC-LIST-005 |
 | `PUT/PATCH/DELETE /booking/999999999` с токеном → `405` | 404 | TC-PUT-003, TC-PATCH-004, TC-DELETE-003 |
 | `DELETE` уже удалённой брони → `405` | 404 | TC-DELETE-004 |
 | `GET /ping` → `201` | 200 | TC-PING-001 |
@@ -74,4 +75,8 @@ Workflow `.github/workflows/restful-booker.yml` — запуск на push в `m
 - Баги выше — умышленные «кривые» сценарии тренировочного API; при изменении
   сервиса тесты нужно актуализировать.
 - Ассерты времени (`< 3000 ms`) могут флакать на холодном старте Heroku.
+- Middle-уровень проверок: deep-equal контракта (echo при создании, read-back при чтении),
+  персистентность и неизменность данных через повторный GET (`pm.sendRequest`),
+  уникальность `bookingid`, проверка `Content-Type` и точных тел ошибок
+  (500 → `Internal Server Error`, 400 → `Bad Request`).
 - Нумерация TC коллекции синхронизирована с xlsx; `TC-BOOK-009`, `TC-LIST-004/005/007`, `TC-PATCH-005` — дополнения к базовому дизайну.
