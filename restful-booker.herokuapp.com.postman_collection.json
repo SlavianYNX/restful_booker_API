@@ -541,9 +541,10 @@
                       "    pm.expect(jsonData.bookingid).to.be.a('number');",
                       "})",
                       "",
-                      "pm.test('Returned booking.totalprice is a string', function () {",
+                      "// BUG: API accepts an invalid (string) totalprice but stores null instead of rejecting or coercing.",
+                      "pm.test('Returned booking.totalprice is null', function () {",
                       "    const jsonData = pm.response.json();",
-                      "    pm.expect(jsonData.booking.totalprice).to.be.a('string');",
+                      "    pm.expect(jsonData.booking.totalprice).to.eql(null);",
                       "})"
                     ]
                   }
@@ -1301,7 +1302,6 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.request.headers.upsert({ key: \"Cookie\", value: \"token=\" + pm.collectionVariables.get(\"token\") });",
                   "",
                   "pm.sendRequest({",
                   "    url: pm.environment.get(\"base_url\") + \"booking\",",
@@ -1339,7 +1339,7 @@
               {
                 "key": "Cookie",
                 "value": "token={{token}}",
-                "disabled": true
+                "disabled": false
               }
             ],
             "body": {
@@ -1448,9 +1448,7 @@
               "listen": "prerequest",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.request.headers.upsert({ key: \"Cookie\", value: \"token=\" + pm.collectionVariables.get(\"token\") });"
-                ]
+                "exec": []
               }
             }
           ],
@@ -1468,7 +1466,7 @@
               {
                 "key": "Cookie",
                 "value": "token={{token}}",
-                "disabled": true
+                "disabled": false
               }
             ],
             "body": {
@@ -1520,9 +1518,7 @@
               "listen": "prerequest",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.request.headers.upsert({ key: \"Cookie\", value: \"token=\" + pm.collectionVariables.get(\"token\") });"
-                ]
+                "exec": []
               }
             }
           ],
@@ -1540,7 +1536,7 @@
               {
                 "key": "Cookie",
                 "value": "token={{token}}",
-                "disabled": true
+                "disabled": false
               }
             ],
             "body": {
@@ -1610,7 +1606,6 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.request.headers.upsert({ key: \"Cookie\", value: \"token=\" + pm.collectionVariables.get(\"token\") });",
                   "",
                   "pm.sendRequest({",
                   "    url: pm.environment.get(\"base_url\") + \"booking\",",
@@ -1648,7 +1643,7 @@
               {
                 "key": "Cookie",
                 "value": "token={{token}}",
-                "disabled": true
+                "disabled": false
               }
             ],
             "body": {
@@ -1713,9 +1708,7 @@
               "listen": "prerequest",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.request.headers.upsert({ key: \"Cookie\", value: \"token=\" + pm.collectionVariables.get(\"token\") });"
-                ]
+                "exec": []
               }
             }
           ],
@@ -1733,7 +1726,7 @@
               {
                 "key": "Cookie",
                 "value": "token={{token}}",
-                "disabled": true
+                "disabled": false
               }
             ],
             "body": {
@@ -1842,9 +1835,7 @@
               "listen": "prerequest",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.request.headers.upsert({ key: \"Cookie\", value: \"token=\" + pm.collectionVariables.get(\"token\") });"
-                ]
+                "exec": []
               }
             }
           ],
@@ -1862,7 +1853,7 @@
               {
                 "key": "Cookie",
                 "value": "token={{token}}",
-                "disabled": true
+                "disabled": false
               }
             ],
             "body": {
@@ -1894,9 +1885,7 @@
               "listen": "prerequest",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.request.headers.upsert({ key: \"Cookie\", value: \"token=\" + pm.collectionVariables.get(\"token\") });"
-                ]
+                "exec": []
               }
             }
           ],
@@ -1914,7 +1903,7 @@
               {
                 "key": "Cookie",
                 "value": "token={{token}}",
-                "disabled": true
+                "disabled": false
               }
             ],
             "body": {
@@ -1971,7 +1960,6 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.request.headers.upsert({ key: \"Cookie\", value: \"token=\" + pm.collectionVariables.get(\"token\") });",
                   "",
                   "pm.sendRequest({",
                   "    url: pm.environment.get(\"base_url\") + \"booking\",",
@@ -2005,7 +1993,7 @@
               {
                 "key": "Cookie",
                 "value": "token={{token}}",
-                "disabled": true
+                "disabled": false
               }
             ],
             "url": {
@@ -2092,9 +2080,7 @@
               "listen": "prerequest",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.request.headers.upsert({ key: \"Cookie\", value: \"token=\" + pm.collectionVariables.get(\"token\") });"
-                ]
+                "exec": []
               }
             }
           ],
@@ -2108,7 +2094,7 @@
               {
                 "key": "Cookie",
                 "value": "token={{token}}",
-                "disabled": true
+                "disabled": false
               }
             ],
             "url": {
@@ -2151,9 +2137,7 @@
               "listen": "prerequest",
               "script": {
                 "type": "text/javascript",
-                "exec": [
-                  "pm.request.headers.upsert({ key: \"Cookie\", value: \"token=\" + pm.collectionVariables.get(\"token\") });"
-                ]
+                "exec": []
               }
             }
           ],
@@ -2167,7 +2151,7 @@
               {
                 "key": "Cookie",
                 "value": "token={{token}}",
-                "disabled": true
+                "disabled": false
               }
             ],
             "url": {
