@@ -22,11 +22,11 @@ jobs:
 
       - name: Run Newman collection
         run: |
-          newman run ://herokuapp.com.postman_collection.json \
-            -e ://herokuapp.com.postman_environment.json \
+          newman run restful-booker.herokuapp.com.postman_collection.json \
+            -e restful-booker.herokuapp.com.postman_environment.json \
             -r cli,htmlextra \
             --reporter-htmlextra-export newman/report.html \
-            --env-var "base_url=https://://herokuapp.com/" \
+            --env-var "base_url=https://restful-booker.herokuapp.com/" \
             --env-var "valid_login=${{ secrets.API_USERNAME }}" \
             --env-var "valid_password=${{ secrets.API_PASSWORD }}"
 
