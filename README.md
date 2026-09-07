@@ -56,23 +56,23 @@ Workflow `.github/workflows/restful-booker.yml` — запуск на push в `m
 Тесты фиксируют **фактическое** поведение сервиса (не ожидаемое), поэтому
 пайплайн остаётся зелёным. Отклонения помечены `// BUG:` в коллекции:
 
-| Наблюдение (проверено на прогонах) | Ожидалось | Кейсы |
-|---|---|---|
-| `POST /auth` с неверными кредами → `200` + `{"reason":"Bad credentials"}` | 401/400 | TC-AUTH-002…005 |
-| `POST /booking` без `firstname` → `500` | 400/422 | TC-BOOK-007 |
-| `POST /booking` без `lastname` → `500` | 400/422 | TC-BOOK-008 |
-| `POST /booking` с пустым телом `{}` → `500` | 400/422 | TC-BOOK-004 |
-| `POST /booking` c `totalprice:"two thousand"` → принято, сохранено `null` | 400/422 | TC-BOOK-005 |
-| `POST /booking` с пустым `firstname` → `200`, бронь создаётся | 400/422 | TC-BOOK-003 |
-| `POST /booking` c `checkout` раньше `checkin` → `200`, бронь создаётся | 400/422 | TC-BOOK-006 |
-| `GET /booking` с невалидной датой → `500` | 400 | TC-LIST-007 |
-| Фильтр `/booking` по точным датам существующей брони → пустой массив (BUG-007) | бронь должна попадать в выборку | TC-LIST-004, TC-LIST-005 |
-| `DELETE` успешной брони → `201 "Created"` (с телом) | 204 (без тела) | TC-DELETE-001 |
-| `PATCH /booking/:id` с пустым телом `{}` → `200`, бронь не меняется | 400/422 | TC-PATCH-005 |
-| `GET /booking/abc` (не-числовой ID) → `404 "Not Found"` | 400 | TC-GET-003 |
-| `PUT/PATCH/DELETE /booking/999999999` с токеном → `405` | 404 | TC-PUT-003, TC-PATCH-004, TC-DELETE-003 |
-| `DELETE` уже удалённой брони → `405` | 404 | TC-DELETE-004 |
-| `GET /ping` → `201` | 200 | TC-PING-001 |
+| Наблюдение (проверено на прогонах) | Ожидалось | Кейсы | Баг |
+|---|---|---|---|
+| `POST /auth` с неверными кредами → `200` + `{"reason":"Bad credentials"}` | 401/400 | TC-AUTH-002…005 | BUG-001 |
+| `POST /booking` без `firstname` → `500` | 400/422 | TC-BOOK-007 | BUG-005 |
+| `POST /booking` без `lastname` → `500` | 400/422 | TC-BOOK-008 | BUG-005 |
+| `POST /booking` с пустым телом `{}` → `500` | 400/422 | TC-BOOK-004 | BUG-005 |
+| `POST /booking` c `totalprice:"two thousand"` → принято, сохранено `null` | 400/422 | TC-BOOK-005 | BUG-003 |
+| `POST /booking` с пустым `firstname` → `200`, бронь создаётся | 400/422 | TC-BOOK-003 | BUG-002 |
+| `POST /booking` c `checkout` раньше `checkin` → `200`, бронь создаётся | 400/422 | TC-BOOK-006 | BUG-004 |
+| `GET /booking` с невалидной датой → `500` | 400 | TC-LIST-007 | BUG-011 |
+| Фильтр `/booking` по точным датам существующей брони → пустой массив | бронь должна попадать в выборку | TC-LIST-004, TC-LIST-005 | BUG-007 |
+| `DELETE` успешной брони → `201 Created` (с телом) | 204 (без тела) | TC-DELETE-001 | BUG-008 |
+| `PATCH /booking/:id` с пустым телом `{}` → `200`, бронь не меняется | 400/422 | TC-PATCH-005 | BUG-009 |
+| `GET /booking/:id` с не-числовым ID → `404 "Not Found"` | 400 | TC-GET-003 | BUG-010 |
+| `PUT/PATCH/DELETE` несуществующего ID → `405` | 404 | TC-PUT-003, TC-PATCH-004, TC-DELETE-003 | BUG-006 |
+| `DELETE` уже удалённой брони → `405` | 404 | TC-DELETE-004 | BUG-006 |
+| `GET /ping` → `201 Created` | 200 | TC-PING-001 | BUG-012 |
 
 ## Особенности
 
