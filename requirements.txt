@@ -1,0 +1,19 @@
+# Дependencies for running the restful_booker_API Postman collection via Newman.
+# NOTE: these are Node.js (npm) packages, not pip packages. The .txt extension is used
+# as a conventional requirements/manifest file for this repo.
+#
+# Install (globally or in a venv-neutral way):
+#   npm install -g newman@6.2.2 newman-reporter-htmlextra@1.23.1
+#
+# CI (`.github/workflows/restful-booker.yml`) installs the same packages without pinning.
+# After installing, run:
+#   newman run restful-booker.herokuapp.com.postman_collection.json \
+#     -e restful-booker.herokuapp.com.postman_environment.json \
+#     --env-var base_url=https://restful-booker.herokuapp.com/ \
+#     --env-var valid_login=<LOGIN> \
+#     --env-var valid_password=<PASSWORD> \
+#     -r cli,htmlextra \
+#     --reporter-htmlextra-export newman/report.html
+
+newman==6.2.2
+newman-reporter-htmlextra==1.23.1

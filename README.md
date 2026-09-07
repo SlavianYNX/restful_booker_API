@@ -7,7 +7,8 @@
 ## Быстрый старт
 
 ```bash
-npm i -g newman newman-reporter-htmlextra
+# версии Newman/htmlextra зафиксированы в requirements.txt
+npm i -g --save-exact newman@6.2.2 newman-reporter-htmlextra@1.23.1
 
 newman run restful-booker.herokuapp.com.postman_collection.json \
   -e restful-booker.herokuapp.com.postman_environment.json \
@@ -56,6 +57,7 @@ Workflow `.github/workflows/restful-booker.yml` — запуск на push в `m
 ├── restful-booker.herokuapp.com.postman_collection.json
 ├── restful-booker.herokuapp.com.postman_environment.json
 ├── RestfulBooker_Тест-кейсы_Баг-репорты.xlsx
+├── requirements.txt (npm-зависимости Newman: newman, newman-reporter-htmlextra)
 └── README.md
 ```
 
