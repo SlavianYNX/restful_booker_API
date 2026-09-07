@@ -8,6 +8,9 @@ on:
 jobs:
   api-tests:
     runs-on: ubuntu-latest
+    env:
+      # Разрешаем использование Node 20 на раннере, чтобы избежать конфликтов в htmlextra
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -15,13 +18,13 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '24' # Обновлено до актуальной версии Node 24
+          node-version: '20' # Фиксируем стабильную 20 версию для Newman
 
       - name: Install Newman and htmlextra reporter
         run: npm install -g newman newman-reporter-htmlextra
 
       - name: Create output directory
-        run: mkdir -p newman # Гарантирует, что папка для отчета точно существует
+        run: mkdir -p newman
 
       - name: Run Newman collection
         run: |
