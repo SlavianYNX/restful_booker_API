@@ -14,8 +14,16 @@ newman run restful-booker.herokuapp.com.postman_collection.json \
   --env-var base_url=https://restful-booker.herokuapp.com/ \
   --env-var valid_login=<LOGIN> \
   --env-var valid_password=<PASSWORD> \
-  -r cli,htmlextra
+  -r cli,htmlextra \
+  --reporter-htmlextra-export newman/report.html
 ```
+
+> **Windows / PowerShell**: без флага `--reporter-htmlextra-export` HTML-отчёт не создаётся
+> (htmlextra печатает его в консоль). Используйте команду одной строкой:
+> ```powershell
+> newman run restful-booker.herokuapp.com.postman_collection.json -e restful-booker.herokuapp.com.postman_environment.json --env-var "base_url=https://restful-booker.herokuapp.com/" --env-var "valid_login=<LOGIN>" --env-var "valid_password=<PASSWORD>" -r cli,htmlextra --reporter-htmlextra-export newman/report.html
+> ```
+> Отчёт появится в `newman/report.html` (папка `newman/` в `.gitignore`, в git не попадает).
 
 Логин/пароль RestfulBooker в репозитории и документации не хранятся (значения по
 умолчанию — в официальной документации сервиса); задаются локально при запуске
