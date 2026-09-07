@@ -15,10 +15,13 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24' # Обновлено до актуальной версии Node 24
 
       - name: Install Newman and htmlextra reporter
         run: npm install -g newman newman-reporter-htmlextra
+
+      - name: Create output directory
+        run: mkdir -p newman # Гарантирует, что папка для отчета точно существует
 
       - name: Run Newman collection
         run: |
