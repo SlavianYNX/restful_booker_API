@@ -36,7 +36,7 @@ jobs:
             --reporter-htmlextra-omitHeaders \
             --reporter-htmlextra-omitRequestBodies \
             --reporter-htmlextra-omitResponseBodies \
-            --env-var "base_url=https://herokuapp.com" \
+            --env-var "base_url=https://restful-booker.herokuapp.com/" \
             --env-var "valid_login=${{ secrets.API_USERNAME }}" \
             --env-var "valid_password=${{ secrets.API_PASSWORD }}"
 
