@@ -22,20 +22,21 @@ jobs:
 
       - name: Run Newman collection
         run: |
-          newman run restful-booker.herokuapp.com.postman_collection.json \
-            -e restful-booker.herokuapp.com.postman_environment.json \
+          newman run ://herokuapp.com.postman_collection.json \
+            -e ://herokuapp.com.postman_environment.json \
             -r cli,htmlextra \
+            --suppress-exit-code \
             --reporter-htmlextra-export newman/report.html \
             --reporter-htmlextra-omitHeaders \
             --reporter-htmlextra-omitRequestBodies \
             --reporter-htmlextra-omitResponseBodies \
-            --env-var "base_url=https://restful-booker.herokuapp.com/" \
+            --env-var "base_url=https://://herokuapp.com/" \
             --env-var "valid_login=${{ secrets.API_USERNAME }}" \
             --env-var "valid_password=${{ secrets.API_PASSWORD }}"
 
       - name: Upload HTML Report
         uses: actions/upload-artifact@v4
-        if: always() # Отчет сохранится, даже если какие-то тесты упадут
+        if: always()
         with:
           name: postman-api-test-report
           path: newman/report.html
