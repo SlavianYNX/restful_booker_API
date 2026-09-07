@@ -1,7 +1,8 @@
 # restful_booker_API
 
 Автотесты (Postman + Newman) для публичного API [RestfulBooker](https://restful-booker.herokuapp.com/apidoc/index.html).
-**39 кейсов** в 8 группах: `POST /auth`, CRUD `/booking`, фильтры списка, `GET /ping`.
+**39 кейсов** в 8 группах (`POST /auth`, CRUD `/booking`, фильтры списка, `GET /ping`)
+и **289 `pm.test`-проверок**.
 
 ## Быстрый старт
 
@@ -62,8 +63,13 @@ Workflow `.github/workflows/restful-booker.yml` — запуск на push в `m
 | `POST /booking` без `lastname` → `500` | 400/422 | TC-BOOK-008 |
 | `POST /booking` с пустым телом `{}` → `500` | 400/422 | TC-BOOK-004 |
 | `POST /booking` c `totalprice:"two thousand"` → принято, сохранено `null` | 400/422 | TC-BOOK-005 |
+| `POST /booking` с пустым `firstname` → `200`, бронь создаётся | 400/422 | TC-BOOK-003 |
+| `POST /booking` c `checkout` раньше `checkin` → `200`, бронь создаётся | 400/422 | TC-BOOK-006 |
 | `GET /booking` с невалидной датой → `500` | 400 | TC-LIST-007 |
 | Фильтр `/booking` по точным датам существующей брони → пустой массив (BUG-007) | бронь должна попадать в выборку | TC-LIST-004, TC-LIST-005 |
+| `DELETE` успешной брони → `201 "Created"` (с телом) | 204 (без тела) | TC-DELETE-001 |
+| `PATCH /booking/:id` с пустым телом `{}` → `200`, бронь не меняется | 400/422 | TC-PATCH-005 |
+| `GET /booking/abc` (не-числовой ID) → `404 "Not Found"` | 400 | TC-GET-003 |
 | `PUT/PATCH/DELETE /booking/999999999` с токеном → `405` | 404 | TC-PUT-003, TC-PATCH-004, TC-DELETE-003 |
 | `DELETE` уже удалённой брони → `405` | 404 | TC-DELETE-004 |
 | `GET /ping` → `201` | 200 | TC-PING-001 |
@@ -75,6 +81,15 @@ Workflow `.github/workflows/restful-booker.yml` — запуск на push в `m
 - Баги выше — умышленные «кривые» сценарии тренировочного API; при изменении
   сервиса тесты нужно актуализировать.
 - Ассерты времени (`< 3000 ms`) могут флакать на холодном старте Heroku.
+- Типовой прогон: ~266 зелёных из 289 ассертов; красные — только намеренные
+  «Contract:»-проверки на задокументированные отклонения (см. таблицу выше).
+- Не-баг шум в прогоне: `pm.expect(...).to.include(payload)` с вложенным объектом
+  (TC-BOOK-002) и async-проверки персистентности через `pm.sendRequest` (TC-PUT-001,
+  TC-PATCH-005) могут флакать сами по себе — прямые вызовы API подтверждают, что
+  данные при этом персистятся корректно.
+- В прогонах 07.09.2026 `DELETE` несуществующей и уже удалённой брони возвращал `403`
+  вместо ранее фиксируемого `405` (TC-DELETE-003/004) — вероятное изменение поведения
+  сервиса, требует мониторинга при актуализации BUG-006.
 - Middle-уровень проверок: deep-equal контракта (echo при создании, read-back при чтении),
   персистентность и неизменность данных через повторный GET (`pm.sendRequest`),
   уникальность `bookingid`, проверка `Content-Type` и точных тел ошибок
