@@ -1,9 +1,10 @@
 {
   "info": {
-    "_postman_id": "1e6a9f32-5cf0-456d-8298-091f78be476e",
+    "_postman_id": "d15cf2ef-c5c6-4e7b-91d2-954e1fde8d4e",
     "name": "restful-booker.herokuapp.com",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "45095256"
+    "_exporter_id": "54832203",
+    "_collection_link": "https://go.postman.co/collection/54832203-d15cf2ef-c5c6-4e7b-91d2-954e1fde8d4e?source=collection_link"
   },
   "item": [
     {
@@ -29,6 +30,7 @@
                 {
                   "listen": "test",
                   "script": {
+                    "type": "text/javascript",
                     "exec": [
                       "pm.test(\"Status code is 200\", function () {\r",
                       "    pm.response.to.have.status(200);\r",
@@ -62,11 +64,27 @@
                       "",
                       "pm.test(\"Token has valid format (10-32 alphanumeric chars)\", function () {",
                       "    pm.expect(responseJson.token).to.match(/^[A-Za-z0-9]{10,32}$/);",
-                      "});"
-                    ],
-                    "type": "text/javascript",
-                    "packages": {},
-                    "requests": {}
+                      "});",
+                      "",
+                      "pm.test('Contract: status is 200', function () {",
+                      "    pm.expect(pm.response.code, 'Expected successful authentication').to.eql(200);",
+                      "})",
+                      "",
+                      "pm.test('SLA: response time is below 2000 ms', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "})",
+                      "",
+                      "pm.test('Content-Type is JSON', function () {",
+                      "    pm.expect(pm.response.headers.get('Content-Type')).to.match(/^application\\/json\\b/i);",
+                      "})",
+                      "",
+                      "pm.test('Auth response schema and token are valid', function () {",
+                      "    const json = pm.response.json();",
+                      "    pm.expect(json).to.have.all.keys('token');",
+                      "    pm.expect(json.token).to.be.a('string').and.not.empty;",
+                      "    pm.environment.set('token', json.token);",
+                      "})"
+                    ]
                   }
                 }
               ],
@@ -114,7 +132,15 @@
                       "pm.test(\"Response time is less than 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
                       "pm.test(\"Response has JSON body\", function () { pm.response.to.have.jsonBody(); });",
                       "pm.test(\"Response does not contain token\", function () { const j = pm.response.json(); pm.expect(j).to.not.have.property(\"token\"); });",
-                      "pm.test(\"Response contains Bad credentials reason\", function () { const j = pm.response.json(); pm.expect(j.reason).to.eql(\"Bad credentials\"); });"
+                      "pm.test(\"Response contains Bad credentials reason\", function () { const j = pm.response.json(); pm.expect(j.reason).to.eql(\"Bad credentials\"); });",
+                      "",
+                      "pm.test('Contract: wrong username is rejected with 401', function () {",
+                      "    pm.expect(pm.response.code, 'Invalid credentials must not return success').to.eql(401);",
+                      "})",
+                      "",
+                      "pm.test('SLA: response time is below 2000 ms', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "})"
                     ]
                   }
                 }
@@ -143,6 +169,29 @@
             },
             {
               "name": "TC-AUTH-003 - Wrong password",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                      "pm.test(\"Response time is less than 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                      "pm.test(\"Response has JSON body\", function () { pm.response.to.have.jsonBody(); });",
+                      "pm.test(\"Response does not contain token\", function () { const j = pm.response.json(); pm.expect(j).to.not.have.property(\"token\"); });",
+                      "pm.test(\"Response contains Bad credentials reason\", function () { const j = pm.response.json(); pm.expect(j.reason).to.eql(\"Bad credentials\"); });",
+                      "",
+                      "pm.test('Contract: wrong password is rejected with 401', function () {",
+                      "    pm.expect(pm.response.code, 'Invalid credentials must not return success').to.eql(401);",
+                      "})",
+                      "",
+                      "pm.test('SLA: response time is below 2000 ms', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "})"
+                    ]
+                  }
+                }
+              ],
               "request": {
                 "method": "POST",
                 "header": [
@@ -172,22 +221,7 @@
                 },
                 "description": "Generated from cURL: curl --location --request POST '{{base_url}}auth' --header 'Content-Type: application/json' --header 'Accept: application/json' --data-raw '{\"username\":\"{{valid_login}}\",\"password\":\"{{invalid_password}}\"}'"
               },
-              "response": [],
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-                      "pm.test(\"Response time is less than 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
-                      "pm.test(\"Response has JSON body\", function () { pm.response.to.have.jsonBody(); });",
-                      "pm.test(\"Response does not contain token\", function () { const j = pm.response.json(); pm.expect(j).to.not.have.property(\"token\"); });",
-                      "pm.test(\"Response contains Bad credentials reason\", function () { const j = pm.response.json(); pm.expect(j.reason).to.eql(\"Bad credentials\"); });"
-                    ]
-                  }
-                }
-              ]
+              "response": []
             },
             {
               "name": "TC-AUTH-004 - Empty body",
@@ -202,7 +236,15 @@
                       "pm.test(\"Response has JSON body\", function () { pm.response.to.have.jsonBody(); });",
                       "pm.test(\"Response contains reason\", function () { const j = pm.response.json(); pm.expect(j).to.have.property(\"reason\"); });",
                       "pm.test(\"Response does not contain token\", function () { const j = pm.response.json(); pm.expect(j).to.not.have.property(\"token\"); });",
-                      "pm.test(\"Response contains Bad credentials reason\", function () { const j = pm.response.json(); pm.expect(j.reason).to.eql(\"Bad credentials\"); });"
+                      "pm.test(\"Response contains Bad credentials reason\", function () { const j = pm.response.json(); pm.expect(j.reason).to.eql(\"Bad credentials\"); });",
+                      "",
+                      "pm.test('Contract: empty auth body is rejected with 400', function () {",
+                      "    pm.expect(pm.response.code, 'Malformed authentication request must be a client error').to.eql(400);",
+                      "})",
+                      "",
+                      "pm.test('SLA: response time is below 2000 ms', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "})"
                     ]
                   }
                 }
@@ -240,6 +282,29 @@
             },
             {
               "name": "TC-AUTH-005 - Missing password",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                      "pm.test(\"Response time is less than 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                      "pm.test(\"Response has JSON body\", function () { pm.response.to.have.jsonBody(); });",
+                      "pm.test(\"Response does not contain token\", function () { const j = pm.response.json(); pm.expect(j).to.not.have.property(\"token\"); });",
+                      "pm.test(\"Response contains Bad credentials reason\", function () { const j = pm.response.json(); pm.expect(j.reason).to.eql(\"Bad credentials\"); });",
+                      "",
+                      "pm.test('Contract: missing password is rejected with 400', function () {",
+                      "    pm.expect(pm.response.code, 'Missing required credential must be a client error').to.eql(400);",
+                      "})",
+                      "",
+                      "pm.test('SLA: response time is below 2000 ms', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "})"
+                    ]
+                  }
+                }
+              ],
               "request": {
                 "method": "POST",
                 "header": [
@@ -269,22 +334,7 @@
                 },
                 "description": "Generated from cURL: curl --location --request POST '{{base_url}}auth' --header 'Content-Type: application/json' --header 'Accept: application/json' --data-raw '{\"username\":\"{{valid_login}}\"}'"
               },
-              "response": [],
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-                      "pm.test(\"Response time is less than 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
-                      "pm.test(\"Response has JSON body\", function () { pm.response.to.have.jsonBody(); });",
-                      "pm.test(\"Response does not contain token\", function () { const j = pm.response.json(); pm.expect(j).to.not.have.property(\"token\"); });",
-                      "pm.test(\"Response contains Bad credentials reason\", function () { const j = pm.response.json(); pm.expect(j.reason).to.eql(\"Bad credentials\"); });"
-                    ]
-                  }
-                }
-              ]
+              "response": []
             }
           ]
         }
@@ -302,66 +352,26 @@
                 {
                   "listen": "test",
                   "script": {
-                    "exec": [
-                      "pm.test(\"Status code is 200\", function () {\r",
-                      "    pm.response.to.have.status(200);\r",
-                      "});\r",
-                      "\r",
-                      "pm.test(\"Response time is less than 3000 ms\", function () {\r",
-                      "    pm.expect(pm.response.responseTime).to.be.below(3000);\r",
-                      "});\r",
-                      "\r",
-                      "pm.test(\"Response has JSON body\", function () {\r",
-                      "    pm.response.to.have.jsonBody();\r",
-                      "});\r",
-                      "\r",
-                      "const responseJson = pm.response.json();\r",
-                      "\r",
-                      "pm.test(\"Response contains bookingid\", function () {\r",
-                      "    pm.expect(responseJson).to.be.an(\"object\");\r",
-                      "    pm.expect(responseJson.bookingid).to.be.a(\"number\");\r",
-                      "});\r",
-                      "\r",
-                      "pm.test(\"Response contains booking object\", function () {\r",
-                      "    pm.expect(responseJson.booking).to.be.an(\"object\");\r",
-                      "});\r",
-                      "\r",
-                      "pm.test(\"Booking object contains expected fields\", function () {\r",
-                      "    pm.expect(responseJson.booking).to.include.keys(\r",
-                      "        \"firstname\",\r",
-                      "        \"lastname\",\r",
-                      "        \"totalprice\",\r",
-                      "        \"depositpaid\",\r",
-                      "        \"bookingdates\"\r",
-                      "    );\r",
-                      "});\r",
-                      "\r",
-                      "pm.collectionVariables.set(\"bookingId\", String(responseJson.bookingid));\r",
-                      "\r",
-                      "console.log(\"Setup: bookingId was saved: \" + responseJson.bookingid);",
-                      "",
-                      "pm.test(\"Content-Type is application/json\", function () {",
-                      "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
-                      "});",
-                      "",
-                      "pm.test(\"bookingid is a positive integer\", function () {",
-                      "    pm.expect(responseJson.bookingid).to.be.a(\"number\").that.is.above(0);",
-                      "});",
-                      "",
-                      "pm.test(\"Response booking echoes full request payload\", function () {",
-                      "    pm.expect(responseJson.booking).to.eql({",
-                      "        firstname: \"Вячеслав\",",
-                      "        lastname: \"Еремин\",",
-                      "        totalprice: 2000,",
-                      "        depositpaid: true,",
-                      "        bookingdates: { checkin: \"2026-04-09\", checkout: \"2026-04-15\" },",
-                      "        additionalneeds: \"Breakfast\"",
-                      "    });",
-                      "});"
-                    ],
                     "type": "text/javascript",
-                    "packages": {},
-                    "requests": {}
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                      "pm.test(\"Response time is less than 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                      "pm.test(\"Response has JSON body\", function () { pm.response.to.have.jsonBody(); });",
+                      "const responseJson = pm.response.json();",
+                      "pm.test(\"Response contains bookingid\", function () { pm.expect(responseJson).to.be.an(\"object\"); pm.expect(responseJson.bookingid).to.be.a(\"number\"); });",
+                      "pm.test(\"Response contains booking object\", function () { pm.expect(responseJson.booking).to.be.an(\"object\"); });",
+                      "pm.test(\"Booking object contains expected fields\", function () { pm.expect(responseJson.booking).to.include.keys(\"firstname\", \"lastname\", \"totalprice\", \"depositpaid\", \"bookingdates\"); });",
+                      "pm.collectionVariables.set(\"bookingId\", String(responseJson.bookingid));",
+                      "pm.collectionVariables.set(\"createdBooking\", JSON.stringify(responseJson.booking));",
+                      "console.log(\"Setup: bookingId and createdBooking were saved: \" + responseJson.bookingid);",
+                      "pm.test(\"Content-Type is application/json\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\"); });",
+                      "pm.test(\"bookingid is a positive integer\", function () { pm.expect(responseJson.bookingid).to.be.a(\"number\").that.is.above(0); });",
+                      "pm.test(\"Response booking echoes full request payload\", function () { pm.expect(responseJson.booking).to.eql({ firstname: \"Вячеслав\", lastname: \"Еремин\", totalprice: 2000, depositpaid: true, bookingdates: { checkin: \"2026-04-09\", checkout: \"2026-04-15\" }, additionalneeds: \"Breakfast\" }); });",
+                      "pm.test('Contract: booking is created with 200', function () { pm.expect(pm.response.code).to.eql(200); });",
+                      "pm.test('SLA: response time is below 2000 ms', function () { pm.expect(pm.response.responseTime).to.be.below(2000); });",
+                      "pm.test('Content-Type is JSON', function () { pm.expect(pm.response.headers.get('Content-Type')).to.match(/^application\\/json\\b/i); });",
+                      "pm.test('Create response schema, payload echo and date invariant are valid', function () { const json = pm.response.json(); const sent = JSON.parse(pm.request.body.raw); pm.expect(json.bookingid).to.be.a('number').and.above(0); pm.expect(json.booking).to.be.an('object'); Object.keys(sent).forEach(function (key) { pm.expect(json.booking[key], 'Mismatch for ' + key).to.eql(sent[key]); }); pm.expect(new Date(json.booking.bookingdates.checkout).getTime()).to.be.above(new Date(json.booking.bookingdates.checkin).getTime()); pm.environment.set('bookingId', String(json.bookingid)); });"
+                    ]
                   }
                 }
               ],
@@ -435,6 +445,26 @@
                       "pm.test('Booking does not have additionalneeds', function () {",
                       "    const booking = pm.response.json().booking;",
                       "    pm.expect(booking).to.not.have.property('additionalneeds');",
+                      "})",
+                      "",
+                      "pm.test('Contract: booking is created with 200', function () {",
+                      "    pm.expect(pm.response.code).to.eql(200);",
+                      "})",
+                      "",
+                      "pm.test('SLA: response time is below 2000 ms', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "})",
+                      "",
+                      "pm.test('Content-Type is JSON', function () {",
+                      "    pm.expect(pm.response.headers.get('Content-Type')).to.match(/^application\\/json\\b/i);",
+                      "})",
+                      "",
+                      "pm.test('Optional additionalneeds may be absent and payload is preserved', function () {",
+                      "    const json = pm.response.json();",
+                      "    const sent = JSON.parse(pm.request.body.raw);",
+                      "    pm.expect(json.bookingid).to.be.a('number').and.above(0);",
+                      "    pm.expect(json.booking).to.include(sent);",
+                      "    pm.expect(json.booking).not.to.have.property('additionalneeds');",
                       "})"
                     ]
                   }
@@ -488,7 +518,15 @@
                       "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
                       "pm.test(\"Response time is less than 3000 ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
                       "pm.test(\"Response has JSON body\", function () { pm.response.to.have.jsonBody(); });",
-                      "pm.test(\"Response contains bookingid\", function () { const j = pm.response.json(); pm.expect(j.bookingid).to.be.a(\"number\"); });"
+                      "pm.test(\"Response contains bookingid\", function () { const j = pm.response.json(); pm.expect(j.bookingid).to.be.a(\"number\"); });",
+                      "",
+                      "pm.test('Contract: empty firstname is rejected with 400', function () {",
+                      "    pm.expect(pm.response.code).to.eql(400);",
+                      "})",
+                      "",
+                      "pm.test('SLA: response time is below 2000 ms', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "})"
                     ]
                   }
                 }
@@ -544,7 +582,15 @@
                       "// BUG: error body is a generic \"Internal Server Error\" text without details (verified on live runs).",
                       "pm.test(\"Error body is generic server error text\", function () {",
                       "    pm.expect(pm.response.text().trim()).to.eql(\"Internal Server Error\");",
-                      "});"
+                      "});",
+                      "",
+                      "pm.test('Contract: empty booking body is rejected with 400', function () {",
+                      "    pm.expect(pm.response.code, 'Empty body must not cause a server error').to.eql(400);",
+                      "})",
+                      "",
+                      "pm.test('SLA: response time is below 2000 ms', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "})"
                     ]
                   }
                 }
@@ -609,6 +655,14 @@
                       "pm.test('Returned booking.totalprice is null', function () {",
                       "    const jsonData = pm.response.json();",
                       "    pm.expect(jsonData.booking.totalprice).to.eql(null);",
+                      "})",
+                      "",
+                      "pm.test('Contract: invalid totalprice type is rejected with 400', function () {",
+                      "    pm.expect(pm.response.code, 'Invalid type must not be coerced').to.eql(400);",
+                      "})",
+                      "",
+                      "pm.test('SLA: response time is below 2000 ms', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
                       "})"
                     ]
                   }
@@ -674,6 +728,14 @@
                       "    const dates = pm.response.json().booking.bookingdates;",
                       "    pm.expect(dates.checkin).to.eql('2026-10-10');",
                       "    pm.expect(dates.checkout).to.eql('2026-10-05');",
+                      "})",
+                      "",
+                      "pm.test('Contract: checkout before checkin is rejected with 400', function () {",
+                      "    pm.expect(pm.response.code).to.eql(400);",
+                      "})",
+                      "",
+                      "pm.test('SLA: response time is below 2000 ms', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
                       "})"
                     ]
                   }
@@ -734,7 +796,15 @@
                       "// BUG: error body is a generic \"Internal Server Error\" text without details (verified on live runs).",
                       "pm.test(\"Error body is generic server error text\", function () {",
                       "    pm.expect(pm.response.text().trim()).to.eql(\"Internal Server Error\");",
-                      "});"
+                      "});",
+                      "",
+                      "pm.test('Contract: missing firstname is rejected with 400', function () {",
+                      "    pm.expect(pm.response.code, 'Missing required field must not cause 500').to.eql(400);",
+                      "})",
+                      "",
+                      "pm.test('SLA: response time is below 2000 ms', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "})"
                     ]
                   }
                 }
@@ -794,7 +864,15 @@
                       "// BUG: error body is a generic \"Internal Server Error\" text without details (verified on live runs).",
                       "pm.test(\"Error body is generic server error text\", function () {",
                       "    pm.expect(pm.response.text().trim()).to.eql(\"Internal Server Error\");",
-                      "});"
+                      "});",
+                      "",
+                      "pm.test('Contract: missing lastname is rejected with 400', function () {",
+                      "    pm.expect(pm.response.code, 'Missing required field must not cause 500').to.eql(400);",
+                      "})",
+                      "",
+                      "pm.test('SLA: response time is below 2000 ms', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "})"
                     ]
                   }
                 }
@@ -832,6 +910,29 @@
             },
             {
               "name": "TC-BOOK-009 - Invalid JSON",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });",
+                      "pm.test('Response time is less than 3000 ms', function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                      "pm.test('Response body is not empty', function () { pm.expect(pm.response.text()).to.not.be.empty; });",
+                      "// Expected error contract: 400 + \"Bad Request\" (verified on live runs).",
+                      "pm.test(\"Error body is Bad Request\", function () { pm.expect(pm.response.text().trim()).to.eql(\"Bad Request\"); });",
+                      "",
+                      "pm.test('Contract: invalid JSON is rejected with 400', function () {",
+                      "    pm.expect(pm.response.code).to.eql(400);",
+                      "})",
+                      "",
+                      "pm.test('SLA: response time is below 2000 ms', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "})"
+                    ]
+                  }
+                }
+              ],
               "request": {
                 "method": "POST",
                 "header": [
@@ -861,22 +962,7 @@
                 },
                 "description": "Generated from cURL: curl --location --request POST '{{base_url}}booking' --header 'Content-Type: application/json' --header 'Accept: application/json' --data-raw '{\"firstname\":\"Slava\",'"
               },
-              "response": [],
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });",
-                      "pm.test('Response time is less than 3000 ms', function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
-                      "pm.test('Response body is not empty', function () { pm.expect(pm.response.text()).to.not.be.empty; });",
-                      "// Expected error contract: 400 + \"Bad Request\" (verified on live runs).",
-                      "pm.test(\"Error body is Bad Request\", function () { pm.expect(pm.response.text().trim()).to.eql(\"Bad Request\"); });"
-                    ]
-                  }
-                }
-              ]
+              "response": []
             }
           ]
         }
@@ -925,6 +1011,27 @@
                   "pm.test('Booking IDs in the list are unique', function () {",
                   "    const ids = pm.response.json().map(function (item) { return item.bookingid; })",
                   "    pm.expect(new Set(ids).size).to.eql(ids.length)",
+                  "})",
+                  "",
+                  "pm.test('Contract: status is 200', function () {",
+                  "    pm.expect(pm.response.code).to.eql(200);",
+                  "})",
+                  "",
+                  "pm.test('SLA: response time is below 2000 ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "})",
+                  "",
+                  "pm.test('Content-Type is JSON', function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.match(/^application\\/json\\b/i);",
+                  "})",
+                  "",
+                  "pm.test('List schema contains numeric booking IDs', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "    json.forEach(function (item, i) {",
+                  "        pm.expect(item, 'Item ' + i).to.have.all.keys('bookingid');",
+                  "        pm.expect(item.bookingid).to.be.a('number').and.above(0);",
+                  "    });",
                   "})"
                 ]
               }
@@ -981,6 +1088,20 @@
                   "pm.test('Filter results contain the booking created in Setup', function () {",
                   "    const ids = pm.response.json().map(function (item) { return item.bookingid; })",
                   "    pm.expect(ids).to.include(Number(pm.collectionVariables.get('bookingId')))",
+                  "})",
+                  "",
+                  "pm.test('Contract: status is 200', function () {",
+                  "    pm.expect(pm.response.code).to.eql(200);",
+                  "})",
+                  "",
+                  "pm.test('SLA: response time is below 2000 ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "})",
+                  "",
+                  "pm.test('Filtered list schema is valid', function () {",
+                  "    pm.response.json().forEach(function (item) {",
+                  "        pm.expect(item.bookingid).to.be.a('number').and.above(0);",
+                  "    });",
                   "})"
                 ]
               }
@@ -1043,6 +1164,20 @@
                   "pm.test('Filter results contain the booking created in Setup', function () {",
                   "    const ids = pm.response.json().map(function (item) { return item.bookingid; })",
                   "    pm.expect(ids).to.include(Number(pm.collectionVariables.get('bookingId')))",
+                  "})",
+                  "",
+                  "pm.test('Contract: status is 200', function () {",
+                  "    pm.expect(pm.response.code).to.eql(200);",
+                  "})",
+                  "",
+                  "pm.test('SLA: response time is below 2000 ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "})",
+                  "",
+                  "pm.test('Filtered list schema is valid', function () {",
+                  "    pm.response.json().forEach(function (item) {",
+                  "        pm.expect(item.bookingid).to.be.a('number').and.above(0);",
+                  "    });",
                   "})"
                 ]
               }
@@ -1102,7 +1237,21 @@
                   "    });",
                   "})",
                   "",
-                  "// BUG: exact-date filter returns an empty array even for a booking with these exact dates (verified on live runs) - structure-only asserts here."
+                  "// BUG: exact-date filter returns an empty array even for a booking with these exact dates (verified on live runs) - structure-only asserts here.",
+                  "",
+                  "pm.test('Contract: status is 200', function () {",
+                  "    pm.expect(pm.response.code).to.eql(200);",
+                  "})",
+                  "",
+                  "pm.test('SLA: response time is below 2000 ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "})",
+                  "",
+                  "pm.test('Filtered list schema is valid', function () {",
+                  "    pm.response.json().forEach(function (item) {",
+                  "        pm.expect(item.bookingid).to.be.a('number').and.above(0);",
+                  "    });",
+                  "})"
                 ]
               }
             }
@@ -1165,7 +1314,21 @@
                   "    });",
                   "})",
                   "",
-                  "// BUG: combined filter with exact dates returns an empty array (same date-filter issue as TC-LIST-004) - structure-only asserts here."
+                  "// BUG: combined filter with exact dates returns an empty array (same date-filter issue as TC-LIST-004) - structure-only asserts here.",
+                  "",
+                  "pm.test('Contract: status is 200', function () {",
+                  "    pm.expect(pm.response.code).to.eql(200);",
+                  "})",
+                  "",
+                  "pm.test('SLA: response time is below 2000 ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "})",
+                  "",
+                  "pm.test('Filtered list schema is valid', function () {",
+                  "    pm.response.json().forEach(function (item) {",
+                  "        pm.expect(item.bookingid).to.be.a('number').and.above(0);",
+                  "    });",
+                  "})"
                 ]
               }
             }
@@ -1232,6 +1395,18 @@
                   "",
                   "pm.test('Response array is empty', function () {",
                   "    pm.expect(pm.response.json()).to.be.an('array').that.is.empty;",
+                  "})",
+                  "",
+                  "pm.test('Contract: status is 200', function () {",
+                  "    pm.expect(pm.response.code).to.eql(200);",
+                  "})",
+                  "",
+                  "pm.test('SLA: response time is below 2000 ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "})",
+                  "",
+                  "pm.test('No bookings match a unique nonexistent firstname', function () {",
+                  "    pm.expect(pm.response.json()).to.eql([]);",
                   "})"
                 ]
               }
@@ -1273,7 +1448,15 @@
                   "pm.test(\"Status code documents actual behavior\", function () { pm.expect([200, 400, 500]).to.include(pm.response.code); });",
                   "pm.test(\"Response time is less than 3000ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
                   "pm.test(\"Response body is not empty\", function () { pm.expect(pm.response.text().trim()).to.not.equal(\"\"); });",
-                  "pm.test(\"If status is 200, response is a JSON array\", function () { if (pm.response.code === 200) { pm.response.to.be.json; pm.expect(pm.response.json()).to.be.an(\"array\"); } });"
+                  "pm.test(\"If status is 200, response is a JSON array\", function () { if (pm.response.code === 200) { pm.response.to.be.json; pm.expect(pm.response.json()).to.be.an(\"array\"); } });",
+                  "",
+                  "pm.test('Contract: invalid date filter is rejected with 400', function () {",
+                  "    pm.expect(pm.response.code, 'Invalid date must not cause 500').to.eql(400);",
+                  "})",
+                  "",
+                  "pm.test('SLA: response time is below 2000 ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "})"
                 ]
               }
             }
@@ -1322,7 +1505,11 @@
                   "pm.test(\"Response includes required keys\", function () { pm.expect(pm.response.json()).to.include.all.keys(\"firstname\", \"lastname\", \"totalprice\", \"depositpaid\", \"bookingdates\"); });",
                   "pm.test(\"Response fields have expected types\", function () { const json = pm.response.json(); pm.expect(json.firstname).to.be.a(\"string\"); pm.expect(json.lastname).to.be.a(\"string\"); pm.expect(json.totalprice).to.be.a(\"number\"); pm.expect(json.depositpaid).to.be.a(\"boolean\"); pm.expect(json.bookingdates).to.be.an(\"object\"); pm.expect(json.bookingdates.checkin).to.be.a(\"string\"); pm.expect(json.bookingdates.checkout).to.be.a(\"string\"); });",
                   "pm.test(\"Content-Type is application/json\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\"); });",
-                  "pm.test(\"Persisted data matches the booking created in Setup (CRUD integrity)\", function () { const j = pm.response.json(); pm.expect(j.firstname).to.eql(\"Вячеслав\"); pm.expect(j.lastname).to.eql(\"Еремин\"); pm.expect(j.totalprice).to.eql(2000); pm.expect(j.depositpaid).to.eql(true); pm.expect(j.bookingdates).to.eql({ checkin: \"2026-04-09\", checkout: \"2026-04-15\" }); pm.expect(j.additionalneeds).to.eql(\"Breakfast\"); });"
+                  "pm.test(\"Persisted data matches the booking created in Setup (CRUD integrity)\", function () { const actual = pm.response.json(); const expectedRaw = pm.collectionVariables.get(\"createdBooking\"); pm.expect(expectedRaw, \"Setup must save createdBooking\").to.be.a(\"string\").and.not.empty; pm.expect(actual).to.eql(JSON.parse(expectedRaw)); });",
+                  "pm.test('Contract: status is 200', function () { pm.expect(pm.response.code).to.eql(200); });",
+                  "pm.test('SLA: response time is below 2000 ms', function () { pm.expect(pm.response.responseTime).to.be.below(2000); });",
+                  "pm.test('Content-Type is JSON', function () { pm.expect(pm.response.headers.get('Content-Type')).to.match(/^application\\/json\\b/i); });",
+                  "pm.test('Booking schema and business invariants are valid', function () { const b = pm.response.json(); pm.expect(b).to.have.all.keys('firstname', 'lastname', 'totalprice', 'depositpaid', 'bookingdates', 'additionalneeds'); pm.expect(b.firstname).to.be.a('string').and.not.empty; pm.expect(b.lastname).to.be.a('string').and.not.empty; pm.expect(b.totalprice).to.be.a('number'); pm.expect(b.depositpaid).to.be.a('boolean'); pm.expect(b.bookingdates.checkin).to.match(/^\\d{4}-\\d{2}-\\d{2}$/); pm.expect(b.bookingdates.checkout).to.match(/^\\d{4}-\\d{2}-\\d{2}$/); pm.expect(new Date(b.bookingdates.checkout).getTime()).to.be.above(new Date(b.bookingdates.checkin).getTime()); });"
                 ]
               }
             }
@@ -1358,7 +1545,15 @@
                 "exec": [
                   "pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });",
                   "pm.test(\"Response time is less than 3000ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
-                  "pm.test(\"Response body is Not Found\", function () { pm.expect(pm.response.text().trim()).to.equal(\"Not Found\"); });"
+                  "pm.test(\"Response body is Not Found\", function () { pm.expect(pm.response.text().trim()).to.equal(\"Not Found\"); });",
+                  "",
+                  "pm.test('Contract: nonexistent booking returns 404', function () {",
+                  "    pm.expect(pm.response.code).to.eql(404);",
+                  "})",
+                  "",
+                  "pm.test('SLA: response time is below 2000 ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "})"
                 ]
               }
             }
@@ -1394,7 +1589,15 @@
                 "exec": [
                   "pm.test(\"Status code is 404\", function () { pm.response.to.have.status(404); });",
                   "pm.test(\"Response time is less than 3000ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
-                  "pm.test(\"Response body is Not Found\", function () { pm.expect(pm.response.text().trim()).to.equal(\"Not Found\"); });"
+                  "pm.test(\"Response body is Not Found\", function () { pm.expect(pm.response.text().trim()).to.equal(\"Not Found\"); });",
+                  "",
+                  "pm.test('Contract: non-numeric booking ID is rejected with 400', function () {",
+                  "    pm.expect(pm.response.code).to.eql(400);",
+                  "})",
+                  "",
+                  "pm.test('SLA: response time is below 2000 ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "})"
                 ]
               }
             }
@@ -1433,57 +1636,19 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response time is less than 3000ms\", function () {",
-                  "    pm.expect(pm.response.responseTime).to.be.below(3000);",
-                  "});",
-                  "",
-                  "pm.test(\"Response is JSON\", function () {",
-                  "    pm.response.to.be.json;",
-                  "});",
-                  "",
-                  "pm.test(\"Response is an object\", function () {",
-                  "    pm.expect(pm.response.json()).to.be.an(\"object\");",
-                  "});",
-                  "",
-                  "pm.test(\"All fields have exact expected values\", function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.firstname).to.eql(\"UpdatedSlava\");",
-                  "    pm.expect(jsonData.lastname).to.eql(\"UpdatedEremin\");",
-                  "    pm.expect(jsonData.totalprice).to.eql(2500);",
-                  "    pm.expect(jsonData.depositpaid).to.eql(false);",
-                  "    pm.expect(jsonData.bookingdates.checkin).to.eql(\"2026-11-01\");",
-                  "    pm.expect(jsonData.bookingdates.checkout).to.eql(\"2026-11-10\");",
-                  "    pm.expect(jsonData.additionalneeds).to.eql(\"Dinner\");",
-                  "});",
-                  "",
-                  "pm.test(\"Response includes all required keys\", function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.include.all.keys(\"firstname\", \"lastname\", \"totalprice\", \"depositpaid\", \"bookingdates\", \"additionalneeds\");",
-                  "    pm.expect(jsonData.bookingdates).to.include.all.keys(\"checkin\", \"checkout\");",
-                  "});",
-                  "",
-                  "pm.test(\"Content-Type is application/json\", function () {",
-                  "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
-                  "});",
-                  "",
-                  "pm.test(\"Update is persisted (GET returns updated data)\", function () {",
-                  "    pm.sendRequest({",
-                  "        url: pm.environment.get(\"base_url\") + \"booking/\" + pm.collectionVariables.get(\"bookingId\"),",
-                  "        method: \"GET\",",
-                  "        header: { \"Accept\": \"application/json\" }",
-                  "    }, function (err, res) {",
-                  "        pm.expect(err, \"sendRequest GET failed\").to.eql(null);",
-                  "        pm.expect(res.code).to.eql(200);",
-                  "        const persisted = res.json();",
-                  "        pm.expect(persisted.firstname).to.eql(\"UpdatedSlava\");",
-                  "        pm.expect(persisted.totalprice).to.eql(2500);",
-                  "        pm.expect(persisted.additionalneeds).to.eql(\"Dinner\");",
-                  "    });",
-                  "});"
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Response time is less than 3000ms\", function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+                  "pm.test(\"Response is JSON\", function () { pm.response.to.be.json; });",
+                  "pm.test(\"Response is an object\", function () { pm.expect(pm.response.json()).to.be.an(\"object\"); });",
+                  "pm.test(\"All fields have exact expected values\", function () { const jsonData = pm.response.json(); pm.expect(jsonData.firstname).to.eql(\"UpdatedSlava\"); pm.expect(jsonData.lastname).to.eql(\"UpdatedEremin\"); pm.expect(jsonData.totalprice).to.eql(2500); pm.expect(jsonData.depositpaid).to.eql(false); pm.expect(jsonData.bookingdates.checkin).to.eql(\"2026-11-01\"); pm.expect(jsonData.bookingdates.checkout).to.eql(\"2026-11-10\"); pm.expect(jsonData.additionalneeds).to.eql(\"Dinner\"); });",
+                  "pm.test(\"Response includes all required keys\", function () { const jsonData = pm.response.json(); pm.expect(jsonData).to.include.all.keys(\"firstname\", \"lastname\", \"totalprice\", \"depositpaid\", \"bookingdates\", \"additionalneeds\"); pm.expect(jsonData.bookingdates).to.include.all.keys(\"checkin\", \"checkout\"); });",
+                  "pm.test(\"Content-Type is application/json\", function () { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\"); });",
+                  "const expectedPersisted = JSON.parse(pm.request.body.raw);",
+                  "pm.sendRequest({ url: pm.environment.get(\"base_url\") + \"booking/\" + pm.collectionVariables.get(\"bookingId\"), method: \"GET\", header: { \"Accept\": \"application/json\" } }, function (err, res) { pm.test(\"Update is persisted (GET returns updated data)\", function () { pm.expect(err, \"sendRequest GET failed\").to.eql(null); pm.expect(res.code).to.eql(200); pm.expect(res.json()).to.eql(expectedPersisted); }); });",
+                  "pm.test('Contract: full update returns 200', function () { pm.expect(pm.response.code).to.eql(200); });",
+                  "pm.test('SLA: response time is below 2000 ms', function () { pm.expect(pm.response.responseTime).to.be.below(2000); });",
+                  "pm.test('Content-Type is JSON', function () { pm.expect(pm.response.headers.get('Content-Type')).to.match(/^application\\/json\\b/i); });",
+                  "pm.test('Updated booking equals request payload', function () { const sent = JSON.parse(pm.request.body.raw); const actual = pm.response.json(); pm.expect(actual).to.eql(sent); pm.expect(new Date(actual.bookingdates.checkout).getTime()).to.be.above(new Date(actual.bookingdates.checkin).getTime()); });"
                 ]
               }
             },
@@ -1528,8 +1693,7 @@
               },
               {
                 "key": "Cookie",
-                "value": "token={{token}}",
-                "disabled": false
+                "value": "token={{token}}"
               }
             ],
             "body": {
@@ -1584,7 +1748,15 @@
                   "        pm.expect(res.code).to.eql(200);",
                   "        pm.expect(res.json().firstname).to.eql(\"UpdatedSlava\");",
                   "    });",
-                  "});"
+                  "});",
+                  "",
+                  "pm.test('Contract: update without token returns 403', function () {",
+                  "    pm.expect(pm.response.code).to.eql(403);",
+                  "})",
+                  "",
+                  "pm.test('SLA: response time is below 2000 ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "})"
                 ]
               }
             }
@@ -1642,7 +1814,15 @@
                   "",
                   "pm.test(\"Response body is not empty\", function () {",
                   "    pm.expect(pm.response.text().trim()).to.not.eql(\"\");",
-                  "});"
+                  "});",
+                  "",
+                  "pm.test('Contract: update of nonexistent booking returns 404', function () {",
+                  "    pm.expect(pm.response.code, 'Nonexistent resource must not return 405').to.eql(404);",
+                  "})",
+                  "",
+                  "pm.test('SLA: response time is below 2000 ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "})"
                 ]
               }
             },
@@ -1667,8 +1847,7 @@
               },
               {
                 "key": "Cookie",
-                "value": "token={{token}}",
-                "disabled": false
+                "value": "token={{token}}"
               }
             ],
             "body": {
@@ -1725,7 +1904,15 @@
                   "        pm.expect(res.json().firstname).to.eql(\"UpdatedSlava\");",
                   "        pm.expect(res.json().lastname).to.eql(\"UpdatedEremin\");",
                   "    });",
-                  "});"
+                  "});",
+                  "",
+                  "pm.test('Contract: missing required field is rejected with 400', function () {",
+                  "    pm.expect(pm.response.code).to.eql(400);",
+                  "})",
+                  "",
+                  "pm.test('SLA: response time is below 2000 ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "})"
                 ]
               }
             },
@@ -1750,8 +1937,7 @@
               },
               {
                 "key": "Cookie",
-                "value": "token={{token}}",
-                "disabled": false
+                "value": "token={{token}}"
               }
             ],
             "body": {
@@ -1833,7 +2019,15 @@
                   "        pm.expect(res.code).to.eql(200);",
                   "        pm.expect(res.json().firstname).to.eql(\"ChainSlava\");",
                   "    });",
-                  "});"
+                  "});",
+                  "",
+                  "pm.test('Contract: invalid token returns 403', function () {",
+                  "    pm.expect(pm.response.code).to.eql(403);",
+                  "})",
+                  "",
+                  "pm.test('SLA: response time is below 2000 ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "})"
                 ]
               }
             }
@@ -1851,8 +2045,7 @@
               },
               {
                 "key": "Cookie",
-                "value": "token=invalid_token_for_negative_test",
-                "disabled": false
+                "value": "token=invalid_token_for_negative_test"
               }
             ],
             "body": {
@@ -1928,7 +2121,23 @@
                   "        pm.expect(persisted.lastname).to.eql(\"ChainEremin\");",
                   "        pm.expect(persisted.totalprice).to.eql(1000);",
                   "    });",
-                  "});"
+                  "});",
+                  "",
+                  "pm.test('Contract: partial update returns 200', function () {",
+                  "    pm.expect(pm.response.code).to.eql(200);",
+                  "})",
+                  "",
+                  "pm.test('SLA: response time is below 2000 ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "})",
+                  "",
+                  "pm.test('PATCH fields are reflected in response', function () {",
+                  "    const sent = JSON.parse(pm.request.body.raw);",
+                  "    const actual = pm.response.json();",
+                  "    Object.keys(sent).forEach(function (k) {",
+                  "        pm.expect(actual[k], 'Mismatch for ' + k).to.eql(sent[k]);",
+                  "    });",
+                  "})"
                 ]
               }
             },
@@ -1973,8 +2182,7 @@
               },
               {
                 "key": "Cookie",
-                "value": "token={{token}}",
-                "disabled": false
+                "value": "token={{token}}"
               }
             ],
             "body": {
@@ -2046,7 +2254,25 @@
                   "        pm.expect(persisted.additionalneeds).to.eql(\"Late checkout\");",
                   "        pm.expect(persisted.firstname).to.eql(\"PatchedSlava\");",
                   "    });",
-                  "});"
+                  "});",
+                  "",
+                  "pm.test('Contract: partial update returns 200', function () {",
+                  "    pm.expect(pm.response.code).to.eql(200);",
+                  "})",
+                  "",
+                  "pm.test('SLA: response time is below 2000 ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "})",
+                  "",
+                  "pm.test('PATCH fields are reflected and schema remains valid', function () {",
+                  "    const sent = JSON.parse(pm.request.body.raw);",
+                  "    const actual = pm.response.json();",
+                  "    Object.keys(sent).forEach(function (k) {",
+                  "        pm.expect(actual[k], 'Mismatch for ' + k).to.eql(sent[k]);",
+                  "    });",
+                  "    pm.expect(actual.firstname).to.be.a('string').and.not.empty;",
+                  "    pm.expect(actual.lastname).to.be.a('string').and.not.empty;",
+                  "})"
                 ]
               }
             },
@@ -2071,8 +2297,7 @@
               },
               {
                 "key": "Cookie",
-                "value": "token={{token}}",
-                "disabled": false
+                "value": "token={{token}}"
               }
             ],
             "body": {
@@ -2127,7 +2352,15 @@
                   "        pm.expect(res.code).to.eql(200);",
                   "        pm.expect(res.json().firstname).to.eql(\"PatchedSlava\");",
                   "    });",
-                  "});"
+                  "});",
+                  "",
+                  "pm.test('Contract: PATCH without token returns 403', function () {",
+                  "    pm.expect(pm.response.code).to.eql(403);",
+                  "})",
+                  "",
+                  "pm.test('SLA: response time is below 2000 ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "})"
                 ]
               }
             }
@@ -2185,7 +2418,15 @@
                   "",
                   "pm.test(\"Response body is not empty\", function () {",
                   "    pm.expect(pm.response.text().trim()).to.not.eql(\"\");",
-                  "});"
+                  "});",
+                  "",
+                  "pm.test('Contract: PATCH of nonexistent booking returns 404', function () {",
+                  "    pm.expect(pm.response.code, 'Nonexistent resource must not return 405').to.eql(404);",
+                  "})",
+                  "",
+                  "pm.test('SLA: response time is below 2000 ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "})"
                 ]
               }
             },
@@ -2210,8 +2451,7 @@
               },
               {
                 "key": "Cookie",
-                "value": "token={{token}}",
-                "disabled": false
+                "value": "token={{token}}"
               }
             ],
             "body": {
@@ -2271,7 +2511,15 @@
                   "    pm.expect(jsonData.totalprice).to.eql(3000);",
                   "    pm.expect(jsonData.depositpaid).to.eql(true);",
                   "    pm.expect(jsonData.additionalneeds).to.eql(\"Late checkout\");",
-                  "});"
+                  "});",
+                  "",
+                  "pm.test('Contract: empty PATCH is rejected with 400', function () {",
+                  "    pm.expect(pm.response.code, 'Empty update must not return success').to.eql(400);",
+                  "})",
+                  "",
+                  "pm.test('SLA: response time is below 2000 ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "})"
                 ]
               }
             },
@@ -2296,8 +2544,7 @@
               },
               {
                 "key": "Cookie",
-                "value": "token={{token}}",
-                "disabled": false
+                "value": "token={{token}}"
               }
             ],
             "body": {
@@ -2356,7 +2603,19 @@
                   "        pm.expect(err, \"sendRequest GET failed\").to.eql(null);",
                   "        pm.expect(res.code).to.eql(404);",
                   "    });",
-                  "});"
+                  "});",
+                  "",
+                  "pm.test('Contract: successful DELETE returns 204', function () {",
+                  "    pm.expect(pm.response.code, 'DELETE success must use 204').to.eql(204);",
+                  "})",
+                  "",
+                  "pm.test('SLA: response time is below 2000 ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "})",
+                  "",
+                  "pm.test('Successful DELETE has no response body', function () {",
+                  "    pm.expect(pm.response.text()).to.eql('');",
+                  "})"
                 ]
               }
             },
@@ -2397,8 +2656,7 @@
               },
               {
                 "key": "Cookie",
-                "value": "token={{token}}",
-                "disabled": false
+                "value": "token={{token}}"
               }
             ],
             "url": {
@@ -2432,7 +2690,15 @@
                   "",
                   "pm.test(\"Response body is Forbidden\", function () {",
                   "    pm.expect(pm.response.text().trim()).to.eql(\"Forbidden\");",
-                  "});"
+                  "});",
+                  "",
+                  "pm.test('Contract: DELETE without token returns 403', function () {",
+                  "    pm.expect(pm.response.code).to.eql(403);",
+                  "})",
+                  "",
+                  "pm.test('SLA: response time is below 2000 ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "})"
                 ]
               }
             }
@@ -2477,7 +2743,15 @@
                   "",
                   "pm.test(\"Response body is not empty\", function () {",
                   "    pm.expect(pm.response.text().trim()).to.not.eql(\"\");",
-                  "});"
+                  "});",
+                  "",
+                  "pm.test('Contract: DELETE nonexistent booking returns 404', function () {",
+                  "    pm.expect(pm.response.code, 'Nonexistent resource must not return 405').to.eql(404);",
+                  "})",
+                  "",
+                  "pm.test('SLA: response time is below 2000 ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "})"
                 ]
               }
             },
@@ -2498,8 +2772,7 @@
               },
               {
                 "key": "Cookie",
-                "value": "token={{token}}",
-                "disabled": false
+                "value": "token={{token}}"
               }
             ],
             "url": {
@@ -2534,7 +2807,15 @@
                   "",
                   "pm.test(\"Response body is not empty\", function () {",
                   "    pm.expect(pm.response.text().trim()).to.not.eql(\"\");",
-                  "});"
+                  "});",
+                  "",
+                  "pm.test('Contract: deleting an already deleted booking returns 404', function () {",
+                  "    pm.expect(pm.response.code, 'Repeated DELETE must not return 405').to.eql(404);",
+                  "})",
+                  "",
+                  "pm.test('SLA: response time is below 2000 ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "})"
                 ]
               }
             },
@@ -2555,8 +2836,7 @@
               },
               {
                 "key": "Cookie",
-                "value": "token={{token}}",
-                "disabled": false
+                "value": "token={{token}}"
               }
             ],
             "url": {
@@ -2599,7 +2879,15 @@
                   "",
                   "pm.test(\"Content-Type is text/plain\", function () {",
                   "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/plain\");",
-                  "});"
+                  "});",
+                  "",
+                  "pm.test('Contract: health check returns 200', function () {",
+                  "    pm.expect(pm.response.code, 'Health endpoint must use 200').to.eql(200);",
+                  "})",
+                  "",
+                  "pm.test('SLA: response time is below 2000 ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "})"
                 ]
               }
             }
@@ -2656,6 +2944,10 @@
     },
     {
       "key": "bookingId",
+      "value": ""
+    },
+    {
+      "key": "createdBooking",
       "value": ""
     }
   ]
