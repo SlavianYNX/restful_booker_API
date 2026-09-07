@@ -28,8 +28,8 @@ jobs:
 
       - name: Run Newman collection
         run: |
-          newman run ://herokuapp.com.postman_collection.json \
-            -e ://herokuapp.com.postman_environment.json \
+          newman run ://restful-booker.herokuapp.com.postman_collection.json \
+            -e ://restful-booker.herokuapp.com.postman_environment.json \
             -r cli,htmlextra \
             --suppress-exit-code \
             --reporter-htmlextra-export newman/report.html \
