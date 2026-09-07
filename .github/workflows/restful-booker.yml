@@ -9,7 +9,7 @@ jobs:
   api-tests:
     runs-on: ubuntu-latest
     env:
-      # Разрешаем использование Node 20 на раннере, чтобы избежать конфликтов в htmlextra
+      # Разрешаем использование Node 20 на раннере для стабильной работы htmlextra
       ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
     steps:
       - name: Checkout repository
@@ -18,7 +18,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # Фиксируем стабильную 20 версию для Newman
+          node-version: '20'
 
       - name: Install Newman and htmlextra reporter
         run: npm install -g newman newman-reporter-htmlextra
@@ -28,15 +28,15 @@ jobs:
 
       - name: Run Newman collection
         run: |
-          newman run ://restful-booker.herokuapp.com.postman_collection.json \
-            -e ://restful-booker.herokuapp.com.postman_environment.json \
+          newman run restful-booker.herokuapp.com.postman_collection.json \
+            -e restful-booker.herokuapp.com.postman_environment.json \
             -r cli,htmlextra \
             --suppress-exit-code \
             --reporter-htmlextra-export newman/report.html \
             --reporter-htmlextra-omitHeaders \
             --reporter-htmlextra-omitRequestBodies \
             --reporter-htmlextra-omitResponseBodies \
-            --env-var "base_url=https://://herokuapp.com/" \
+            --env-var "base_url=https://herokuapp.com" \
             --env-var "valid_login=${{ secrets.API_USERNAME }}" \
             --env-var "valid_password=${{ secrets.API_PASSWORD }}"
 
